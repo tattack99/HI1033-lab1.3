@@ -13,6 +13,9 @@
 		CE313C4D2B26F19200DCFA94 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE313C4C2B26F19200DCFA94 /* ContentView.swift */; };
 		CE313C4F2B26F19500DCFA94 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CE313C4E2B26F19500DCFA94 /* Assets.xcassets */; };
 		CE313C532B26F19500DCFA94 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CE313C522B26F19500DCFA94 /* Preview Assets.xcassets */; };
+		CE313C5F2B27132900DCFA94 /* BluetoothConnect.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE313C5E2B27132900DCFA94 /* BluetoothConnect.swift */; };
+		CE313C612B2713AA00DCFA94 /* ViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE313C602B2713AA00DCFA94 /* ViewModel.swift */; };
+		CE313C642B2714BF00DCFA94 /* Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE313C632B2714BF00DCFA94 /* Model.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,6 +27,9 @@
 		CE313C4E2B26F19500DCFA94 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		CE313C502B26F19500DCFA94 /* lab1_3.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = lab1_3.entitlements; sourceTree = "<group>"; };
 		CE313C522B26F19500DCFA94 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		CE313C5E2B27132900DCFA94 /* BluetoothConnect.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothConnect.swift; sourceTree = "<group>"; };
+		CE313C602B2713AA00DCFA94 /* ViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewModel.swift; sourceTree = "<group>"; };
+		CE313C632B2714BF00DCFA94 /* Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Model.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -56,12 +62,11 @@
 		CE313C442B26F19200DCFA94 /* lab1.3 */ = {
 			isa = PBXGroup;
 			children = (
-				CE313C452B26F19200DCFA94 /* lab1_3App.swift */,
-				CE313C472B26F19200DCFA94 /* Persistence.swift */,
-				CE313C4C2B26F19200DCFA94 /* ContentView.swift */,
-				CE313C4E2B26F19500DCFA94 /* Assets.xcassets */,
 				CE313C502B26F19500DCFA94 /* lab1_3.entitlements */,
-				CE313C492B26F19200DCFA94 /* lab1_3.xcdatamodeld */,
+				CE313C622B27143900DCFA94 /* util */,
+				CE313C5B2B270E8500DCFA94 /* views */,
+				CE313C5C2B2712FB00DCFA94 /* model */,
+				CE313C452B26F19200DCFA94 /* lab1_3App.swift */,
 				CE313C512B26F19500DCFA94 /* Preview Content */,
 			);
 			path = lab1.3;
@@ -73,6 +78,50 @@
 				CE313C522B26F19500DCFA94 /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		CE313C5B2B270E8500DCFA94 /* views */ = {
+			isa = PBXGroup;
+			children = (
+				CE313C4C2B26F19200DCFA94 /* ContentView.swift */,
+			);
+			path = views;
+			sourceTree = "<group>";
+		};
+		CE313C5C2B2712FB00DCFA94 /* model */ = {
+			isa = PBXGroup;
+			children = (
+				CE313C652B272C1F00DCFA94 /* bluetooth */,
+				CE313C5D2B27131200DCFA94 /* persistance */,
+				CE313C632B2714BF00DCFA94 /* Model.swift */,
+				CE313C602B2713AA00DCFA94 /* ViewModel.swift */,
+			);
+			path = model;
+			sourceTree = "<group>";
+		};
+		CE313C5D2B27131200DCFA94 /* persistance */ = {
+			isa = PBXGroup;
+			children = (
+				CE313C472B26F19200DCFA94 /* Persistence.swift */,
+				CE313C492B26F19200DCFA94 /* lab1_3.xcdatamodeld */,
+			);
+			path = persistance;
+			sourceTree = "<group>";
+		};
+		CE313C622B27143900DCFA94 /* util */ = {
+			isa = PBXGroup;
+			children = (
+				CE313C4E2B26F19500DCFA94 /* Assets.xcassets */,
+			);
+			path = util;
+			sourceTree = "<group>";
+		};
+		CE313C652B272C1F00DCFA94 /* bluetooth */ = {
+			isa = PBXGroup;
+			children = (
+				CE313C5E2B27132900DCFA94 /* BluetoothConnect.swift */,
+			);
+			path = bluetooth;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -145,9 +194,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CE313C642B2714BF00DCFA94 /* Model.swift in Sources */,
+				CE313C5F2B27132900DCFA94 /* BluetoothConnect.swift in Sources */,
 				CE313C462B26F19200DCFA94 /* lab1_3App.swift in Sources */,
 				CE313C482B26F19200DCFA94 /* Persistence.swift in Sources */,
 				CE313C4D2B26F19200DCFA94 /* ContentView.swift in Sources */,
+				CE313C612B2713AA00DCFA94 /* ViewModel.swift in Sources */,
 				CE313C4B2B26F19200DCFA94 /* lab1_3.xcdatamodeld in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -273,8 +325,10 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"lab1.3/Preview Content\"";
+				DEVELOPMENT_TEAM = LK677WVD79;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "Hello I need access";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -309,8 +363,10 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"lab1.3/Preview Content\"";
+				DEVELOPMENT_TEAM = LK677WVD79;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "Hello I need access";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
