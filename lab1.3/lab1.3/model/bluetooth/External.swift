@@ -15,21 +15,29 @@ struct SensorData {
     var zValue: Float = 0.0
 }
 
+struct Gyroscope {
+    var xValue: Float = 0.0
+    var yValue: Float = 0.0
+    var zValue: Float = 0.0
+}
+
 class BluetoothConnect: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate {
     var centralManager: CBCentralManager!
     var peripheralBLE: CBPeripheral!
     
-    var sensorData: SensorData
+    var accData: SensorData
+    var gyroData: SensorData
     var peripherals: [CBPeripheral]
     var onPeripheralDiscovered: ((CBPeripheral) -> Void)?
 
     let GATTService = CBUUID(string: "fb005c80-02e7-f387-1cad-8acd2d8df0c8")
     let GATTCommand = CBUUID(string: "fb005c81-02e7-f387-1cad-8acd2d8df0c8")
-    let GATTData = CBUUID(string: "fb005c82-02e7-f387-1cad-8acd2d8df0c8")
+    let GATTData = CBUUID(string:    "fb005c82-02e7-f387-1cad-8acd2d8df0c8")
     
     override init(){
         print("init")
-        self.sensorData = SensorData()
+        self.accData = SensorData()
+        self.gyroData = SensorData()
         self.peripherals = []
         
         super.init()
@@ -102,25 +110,50 @@ class BluetoothConnect: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
             if characteristic.uuid == GATTCommand{
                 print("Command")
                 
-                //let parameter:[UInt8]  = [0x02, 0x00, 0x00, 0x01, 0x82, 0x00, 0x01, 0x01, 0x0E, 0x00]
+                // Gyroscope
+                let gyroParameter : [UInt8]  = [0x02, 0x05, 0x00, 0x01, 0x34, 0x00, 0x01, 0x01, 0x10, 0x00, 0x02, 0x01, 0xD0, 0x07, 0x04, 0x01, 0x03]
+                let gyroData = NSData(bytes: gyroParameter, length: gyroParameter.count)
                 
-                let parameter:[UInt8]  = [0x02, 0x02, 0x00, 0x01, 0x34, 0x00, 0x01, 0x01, 0x10, 0x00, 0x02, 0x01, 0x08, 0x00, 0x04, 0x01, 0x03]
+                peripheral.writeValue(gyroData as Data, for: characteristic, type: CBCharacteristicWriteType.withResponse)
                 
-       
-          
+                /*
+                // accelerometer
+                let accParameter:[UInt8]  = [0x02, 0x02, 0x00, 0x01, 0x34, 0x00, 0x01, 0x01, 0x10, 0x00, 0x02, 0x01, 0x08, 0x00, 0x04, 0x01, 0x03]
+                let accData = NSData(bytes: accParameter, length: 17)
+                peripheral.writeValue(accData as Data, for: characteristic, type: CBCharacteristicWriteType.withResponse)
+                 */
+                
+                
                 // 02 02 00 01
                 // 34 00 01 01
                 // 10 00 02 01
                 // 08 00 04 01 03
                 
-                //let parameter:[UInt8]  = [0x02, 0x02]
+                //let parameter:[UInt8]  = [0x02, 0x00, 0x00, 0x01, 0x82, 0x00, 0x01, 0x01, 0x0E, 0x00]
                 
-                let data = NSData(bytes: parameter, length: 17)
+                // Accelerometer 2 bit
+                //let parameter:[UInt8]  = [0x02, 0x02]
         
-                peripheral.writeValue(data as Data, for: characteristic, type: CBCharacteristicWriteType.withResponse)
+                //peripheral.writeValue(data as Data, for: characteristic, type: CBCharacteristicWriteType.withResponse)
             }
         }
     }
+    func peripheral(_ peripheral: CBPeripheral, didWriteValueFor characteristic: CBCharacteristic, error: Error?) {
+        if let error = error {
+            print("Error writing value to characteristic: \(error)")
+            return
+        }
+
+        // Check if this is the response to the gyroscope configuration
+        if characteristic.uuid == GATTCommand { // Replace GATTCommand with the actual characteristic UUID if needed
+            // Now that gyroscope configuration is confirmed, write the accelerometer configuration
+            let accParameter: [UInt8] = [0x02, 0x02, 0x00, 0x01, 0x34, 0x00, 0x01, 0x01, 0x10, 0x00, 0x02, 0x01, 0x08, 0x00, 0x04, 0x01, 0x03]
+            let accData = Data(bytes: accParameter, count: accParameter.count)
+
+            peripheral.writeValue(accData as Data, for: characteristic, type: CBCharacteristicWriteType.withResponse)
+        }
+    }
+
     
     func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic,
                     error: Error?) {
@@ -184,23 +217,40 @@ class BluetoothConnect: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
             ySample = ySample + delta[1];
             zSample = zSample + delta[2];
             
-            print("xDelta:\(xSample) yDelta:\(ySample) zDelta:\(zSample)")
+            //print("xDelta:\(xSample) yDelta:\(ySample) zDelta:\(zSample)")
             
             DispatchQueue.main.async {
-                self.sensorData.xValue = Float(xSample) / 4096.0
-                self.sensorData.yValue = Float(ySample) / 4096.0
-                self.sensorData.zValue = Float(zSample) / 4096.0
+                
+                switch measId {
+                case 2 :
+                    print("2")
+                    self.accData.xValue = Float(xSample) / 4096.0
+                    self.accData.yValue = Float(ySample) / 4096.0
+                    self.accData.zValue = Float(zSample) / 4096.0
 
-                // Round to two decimal places
-                self.sensorData.xValue = (self.sensorData.xValue * 100).rounded() / 100
-                self.sensorData.yValue = (self.sensorData.yValue * 100).rounded() / 100
-                self.sensorData.zValue = (self.sensorData.zValue * 100).rounded() / 100
+                    // Round to two decimal places
+                    self.accData.xValue = (self.accData.xValue * 100).rounded() / 100
+                    self.accData.yValue = (self.accData.yValue * 100).rounded() / 100
+                    self.accData.zValue = (self.accData.zValue * 100).rounded() / 100
+                    print("xDelta:\(self.accData.xValue) yDelta:\(self.accData.yValue) zDelta:\(self.accData.zValue)")
+
+                case 5 :
+                    print("5")
+                    self.gyroData.xValue = Float(xSample) / 16.384
+                    self.gyroData.yValue = Float(ySample) / 16.384
+                    self.gyroData.zValue = Float(zSample) / 16.384
+
+                    // Round to two decimal places
+                    self.gyroData.xValue = (self.gyroData.xValue * 100).rounded() / 100
+                    self.gyroData.yValue = (self.gyroData.yValue * 100).rounded() / 100
+                    self.gyroData.zValue = (self.gyroData.zValue * 100).rounded() / 100
+                    print("xDelta:\(self.gyroData.xValue) yDelta:\(self.gyroData.yValue) zDelta:\(self.gyroData.zValue)")
+
+                default:
+                    print("Other")
+                }
             }
-    
-            
         }
-        
-        
     }
     
    
