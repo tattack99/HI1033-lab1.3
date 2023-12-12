@@ -16,6 +16,8 @@
 		CE313C5F2B27132900DCFA94 /* External.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE313C5E2B27132900DCFA94 /* External.swift */; };
 		CE313C612B2713AA00DCFA94 /* ViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE313C602B2713AA00DCFA94 /* ViewModel.swift */; };
 		CE313C642B2714BF00DCFA94 /* Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE313C632B2714BF00DCFA94 /* Model.swift */; };
+		CE6B5C772B284E0B008B7FC6 /* TestScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE6B5C762B284E0B008B7FC6 /* TestScreen.swift */; };
+		CE6B5C792B284E2A008B7FC6 /* DefaultScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE6B5C782B284E2A008B7FC6 /* DefaultScreen.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -30,6 +32,8 @@
 		CE313C5E2B27132900DCFA94 /* External.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = External.swift; sourceTree = "<group>"; };
 		CE313C602B2713AA00DCFA94 /* ViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewModel.swift; sourceTree = "<group>"; };
 		CE313C632B2714BF00DCFA94 /* Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Model.swift; sourceTree = "<group>"; };
+		CE6B5C762B284E0B008B7FC6 /* TestScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestScreen.swift; sourceTree = "<group>"; };
+		CE6B5C782B284E2A008B7FC6 /* DefaultScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultScreen.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -84,6 +88,8 @@
 			isa = PBXGroup;
 			children = (
 				CE313C4C2B26F19200DCFA94 /* ContentView.swift */,
+				CE6B5C762B284E0B008B7FC6 /* TestScreen.swift */,
+				CE6B5C782B284E2A008B7FC6 /* DefaultScreen.swift */,
 			);
 			path = views;
 			sourceTree = "<group>";
@@ -197,7 +203,9 @@
 				CE313C642B2714BF00DCFA94 /* Model.swift in Sources */,
 				CE313C5F2B27132900DCFA94 /* External.swift in Sources */,
 				CE313C462B26F19200DCFA94 /* lab1_3App.swift in Sources */,
+				CE6B5C772B284E0B008B7FC6 /* TestScreen.swift in Sources */,
 				CE313C482B26F19200DCFA94 /* Persistence.swift in Sources */,
+				CE6B5C792B284E2A008B7FC6 /* DefaultScreen.swift in Sources */,
 				CE313C4D2B26F19200DCFA94 /* ContentView.swift in Sources */,
 				CE313C612B2713AA00DCFA94 /* ViewModel.swift in Sources */,
 				CE313C4B2B26F19200DCFA94 /* lab1_3.xcdatamodeld in Sources */,

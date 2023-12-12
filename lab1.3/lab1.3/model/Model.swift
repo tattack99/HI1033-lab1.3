@@ -18,7 +18,7 @@ struct Model {
         polar = BluetoothConnect()
         storage = PersistenceController()
         
-        //polar.start()
+        polar.start()
     }
     
     func createEntity() async {
