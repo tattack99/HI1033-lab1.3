@@ -7,50 +7,92 @@
 
 import CoreData
 
+struct MyItem : Hashable{
+    var timestamp : Date
+}
+
 struct PersistenceController {
-    static let shared = PersistenceController()
-
-    static var preview: PersistenceController = {
-        let result = PersistenceController(inMemory: true)
-        let viewContext = result.container.viewContext
-        for _ in 0..<10 {
-            let newItem = Item(context: viewContext)
-            newItem.timestamp = Date()
-        }
-        do {
-            try viewContext.save()
-        } catch {
-            // Replace this implementation with code to handle the error appropriately.
-            // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-            let nsError = error as NSError
-            fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
-        }
-        return result
-    }()
-
+    
     let container: NSPersistentContainer
 
-    init(inMemory: Bool = false) {
+    init() {
         container = NSPersistentContainer(name: "lab1_3")
-        if inMemory {
-            container.persistentStoreDescriptions.first!.url = URL(fileURLWithPath: "/dev/null")
-        }
-        container.loadPersistentStores(completionHandler: { (storeDescription, error) in
-            if let error = error as NSError? {
-                // Replace this implementation with code to handle the error appropriately.
-                // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-
-                /*
-                 Typical reasons for an error here include:
-                 * The parent directory does not exist, cannot be created, or disallows writing.
-                 * The persistent store is not accessible, due to permissions or data protection when the device is locked.
-                 * The device is out of space.
-                 * The store could not be migrated to the current model version.
-                 Check the error message to determine what the actual problem was.
-                 */
-                fatalError("Unresolved error \(error), \(error.userInfo)")
+        container.loadPersistentStores { description, error in
+            if let error = error {
+                print("Error loading from core data: \(error)")
             }
-        })
-        container.viewContext.automaticallyMergesChangesFromParent = true
+            else {
+                print("Successfully loaded core data!")
+            }
+        }
+    }
+    
+    func createEntity() async {
+        let context = container.newBackgroundContext()
+        await context.perform {
+            let newEntity = ItemEntity(context: context)
+            newEntity.timestamp = Date.now
+            do {
+                try context.save()
+                // print("Created entity \(context) + \(String(describing: newEntity.timestamp))")
+            } catch {
+                print("Failed to create entity: \(error)")
+            }
+        }
+    }
+
+    
+    func loadEntities() async -> [MyItem] {
+        let context = container.newBackgroundContext()
+        return await context.perform {
+            let fetchRequest: NSFetchRequest<ItemEntity> = ItemEntity.fetchRequest()
+            do {
+                let entities = try context.fetch(fetchRequest)
+                return entities.compactMap { entity in
+                    guard let timestamp = entity.timestamp else { return nil }
+                    return MyItem(timestamp: timestamp)
+                }
+            } catch {
+                print("Failed to fetch entities: \(error)")
+                return []
+            }
+        }
+    }
+
+
+    
+    func deleteEntity(entity: MyItem) async {
+        let context = container.newBackgroundContext()
+        await context.perform {
+            let fetchRequest: NSFetchRequest<NSFetchRequestResult> = NSFetchRequest(entityName: "ItemEntity")
+            // Use a property of MyItem to find the corresponding Core Data entity
+            fetchRequest.predicate = NSPredicate(format: "timestamp == %@", entity.timestamp as CVarArg)
+
+            do {
+                let results = try context.fetch(fetchRequest)
+                if let objectToDelete = results.first as? NSManagedObject {
+                    context.delete(objectToDelete)
+                    try context.save()
+                    //print("Entity deleted successfully.")
+                } else {
+                    print("No matching object found.")
+                }
+            } catch {
+                print("Failed to delete entity: \(error)")
+            }
+        }
+    }
+
+    
+    
+    func clearCoreDataStore() {
+        guard let storeURL = container.persistentStoreDescriptions.first?.url else { return }
+
+        do {
+            try container.persistentStoreCoordinator.destroyPersistentStore(at: storeURL, ofType: NSSQLiteStoreType, options: nil)
+            try container.persistentStoreCoordinator.addPersistentStore(ofType: NSSQLiteStoreType, configurationName: nil, at: storeURL, options: nil)
+        } catch {
+            print("Error clearing Core Data store: \(error)")
+        }
     }
 }

@@ -13,7 +13,7 @@
 		CE313C4D2B26F19200DCFA94 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE313C4C2B26F19200DCFA94 /* ContentView.swift */; };
 		CE313C4F2B26F19500DCFA94 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CE313C4E2B26F19500DCFA94 /* Assets.xcassets */; };
 		CE313C532B26F19500DCFA94 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CE313C522B26F19500DCFA94 /* Preview Assets.xcassets */; };
-		CE313C5F2B27132900DCFA94 /* BluetoothConnect.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE313C5E2B27132900DCFA94 /* BluetoothConnect.swift */; };
+		CE313C5F2B27132900DCFA94 /* External.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE313C5E2B27132900DCFA94 /* External.swift */; };
 		CE313C612B2713AA00DCFA94 /* ViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE313C602B2713AA00DCFA94 /* ViewModel.swift */; };
 		CE313C642B2714BF00DCFA94 /* Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE313C632B2714BF00DCFA94 /* Model.swift */; };
 /* End PBXBuildFile section */
@@ -27,7 +27,7 @@
 		CE313C4E2B26F19500DCFA94 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		CE313C502B26F19500DCFA94 /* lab1_3.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = lab1_3.entitlements; sourceTree = "<group>"; };
 		CE313C522B26F19500DCFA94 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
-		CE313C5E2B27132900DCFA94 /* BluetoothConnect.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothConnect.swift; sourceTree = "<group>"; };
+		CE313C5E2B27132900DCFA94 /* External.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = External.swift; sourceTree = "<group>"; };
 		CE313C602B2713AA00DCFA94 /* ViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewModel.swift; sourceTree = "<group>"; };
 		CE313C632B2714BF00DCFA94 /* Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Model.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -119,7 +119,7 @@
 		CE313C652B272C1F00DCFA94 /* bluetooth */ = {
 			isa = PBXGroup;
 			children = (
-				CE313C5E2B27132900DCFA94 /* BluetoothConnect.swift */,
+				CE313C5E2B27132900DCFA94 /* External.swift */,
 			);
 			path = bluetooth;
 			sourceTree = "<group>";
@@ -195,7 +195,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				CE313C642B2714BF00DCFA94 /* Model.swift in Sources */,
-				CE313C5F2B27132900DCFA94 /* BluetoothConnect.swift in Sources */,
+				CE313C5F2B27132900DCFA94 /* External.swift in Sources */,
 				CE313C462B26F19200DCFA94 /* lab1_3App.swift in Sources */,
 				CE313C482B26F19200DCFA94 /* Persistence.swift in Sources */,
 				CE313C4D2B26F19200DCFA94 /* ContentView.swift in Sources */,
