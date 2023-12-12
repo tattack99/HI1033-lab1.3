@@ -7,14 +7,34 @@
 
 import Foundation
 import CoreBluetooth
+import SwiftUI
+
+struct SensorData {
+    var xValue: Float = 0.0
+    var yValue: Float = 0.0
+    var zValue: Float = 0.0
+}
 
 class BluetoothConnect: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate {
     var centralManager: CBCentralManager!
     var peripheralBLE: CBPeripheral!
     
+    var sensorData: SensorData
+    var peripherals: [CBPeripheral]
+    var onPeripheralDiscovered: ((CBPeripheral) -> Void)?
+
     let GATTService = CBUUID(string: "fb005c80-02e7-f387-1cad-8acd2d8df0c8")
     let GATTCommand = CBUUID(string: "fb005c81-02e7-f387-1cad-8acd2d8df0c8")
     let GATTData = CBUUID(string: "fb005c82-02e7-f387-1cad-8acd2d8df0c8")
+    
+    override init(){
+        print("init")
+        self.sensorData = SensorData()
+        self.peripherals = []
+        
+        super.init()
+        self.centralManager = CBCentralManager(delegate: self, queue: nil)
+    }
     
     func centralManagerDidUpdateState(_ central: CBCentralManager) {
         switch central.state {
@@ -37,23 +57,30 @@ class BluetoothConnect: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
     }
     
     func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi RSSI: NSNumber) {
-        print("didDiscover")
-        
+        //print("Discover")
+                
         if let name = peripheral.name, name.contains("Polar"){
-            print("Found Polar")
-            peripheralBLE = peripheral
-            peripheralBLE.delegate = self
-            centralManager.connect(peripheralBLE)
-            central.stopScan()
-            
-    
+            //print("Found Polar")
+            if !peripherals.contains(peripheral) {
+                peripherals.append(peripheral)
+                print("Added Polar to List: \(String(describing: peripheral.name))")
+                onPeripheralDiscovered?(peripheral)
+            }
         }
     }
     
+    func connectToPeripheral(_ peripheral: CBPeripheral) {
+        print("Connect to Peripheral: \(String(describing: peripheral.name))")
+        self.peripheralBLE = peripheral
+        self.peripheralBLE?.delegate = self
+        self.centralManager?.connect(peripheralBLE!, options: nil)
+        self.centralManager.stopScan()
+    }
+    
     func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
-            print("didConnect")
-           peripheral.discoverServices(nil)
-           central.scanForPeripherals(withServices: [GATTService], options: nil)
+        print("Connected")
+        peripheral.discoverServices(nil)
+        central.scanForPeripherals(withServices: [GATTService], options: nil)
     }
     
     func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
@@ -158,6 +185,17 @@ class BluetoothConnect: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
             zSample = zSample + delta[2];
             
             print("xDelta:\(xSample) yDelta:\(ySample) zDelta:\(zSample)")
+            
+            DispatchQueue.main.async {
+                self.sensorData.xValue = Float(xSample) / 4096.0
+                self.sensorData.yValue = Float(ySample) / 4096.0
+                self.sensorData.zValue = Float(zSample) / 4096.0
+
+                // Round to two decimal places
+                self.sensorData.xValue = (self.sensorData.xValue * 100).rounded() / 100
+                self.sensorData.yValue = (self.sensorData.yValue * 100).rounded() / 100
+                self.sensorData.zValue = (self.sensorData.zValue * 100).rounded() / 100
+            }
     
             
         }
@@ -195,22 +233,6 @@ class BluetoothConnect: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
             })
         })
     }
-    
-    
-   
-    
-    
-    
-    override init(){
-        super.init()
-    }
-    
-    func start(){
-        print("centralManager")
-        centralManager = CBCentralManager(delegate: self, queue: nil)
-    }
-    
-    
-    
+
 }
 

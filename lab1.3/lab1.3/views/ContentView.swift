@@ -12,32 +12,8 @@ struct ContentView: View {
     @EnvironmentObject var viewModel: ViewModel
 
     var body: some View {
-        NavigationView {
-            List {
-                ForEach(viewModel.items, id: \.self) { item in
-                    NavigationLink {
-                        Text("Item at \(item.timestamp, formatter: itemFormatter)")
-                        } label: {
-                       Text(item.timestamp, formatter: itemFormatter)
-                   }
-                }
-                .onDelete(perform: { offsets in
-                    viewModel.deleteEntity(at: offsets)
-                })
-                }
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    EditButton()
-                }
-                ToolbarItem {
-                    Button(action: { viewModel.createEntity()}) {
-                        Label("Add Item", systemImage: "plus")
-                    }
-                }
-            }
-            Text("Select an item")
-            }
-        }
+        MacOSView()
+    }
     
     
     private let itemFormatter: DateFormatter = {

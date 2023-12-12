@@ -7,18 +7,19 @@
 
 import Foundation
 import CoreData
+import CoreBluetooth
 
-struct Model {
+class Model {
     
     private var polar: BluetoothConnect
     private var storage : PersistenceController
-
+    
+    @Published var discoveredPeripherals: [CBPeripheral] = []
     
     init() {
         polar = BluetoothConnect()
         storage = PersistenceController()
-        
-        polar.start()
+        initBluetoothConnect()
     }
     
     func createEntity() async {
@@ -31,6 +32,18 @@ struct Model {
     
     func deleteEntity(entity: MyItem) async {
         await storage.deleteEntity(entity: entity)
+    }
+    
+    func connectToPeripheral(_ peripheral: CBPeripheral) {
+        polar.connectToPeripheral(peripheral)
+    }
+    
+    private func initBluetoothConnect(){
+        polar.onPeripheralDiscovered = { [weak self] peripheral in
+            if !(self?.discoveredPeripherals.contains(peripheral) ?? false) {
+                self?.discoveredPeripherals.append(peripheral)
+            }
+        }
     }
     
 }
