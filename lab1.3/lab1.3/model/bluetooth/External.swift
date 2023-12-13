@@ -15,12 +15,6 @@ struct SensorData {
     var zValue: Float = 0.0
 }
 
-struct Gyroscope {
-    var xValue: Float = 0.0
-    var yValue: Float = 0.0
-    var zValue: Float = 0.0
-}
-
 class BluetoothConnect: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate {
     var centralManager: CBCentralManager!
     var peripheralBLE: CBPeripheral!
@@ -115,38 +109,17 @@ class BluetoothConnect: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
                 let gyroData = NSData(bytes: gyroParameter, length: gyroParameter.count)
                 
                 peripheral.writeValue(gyroData as Data, for: characteristic, type: CBCharacteristicWriteType.withResponse)
-                
-                /*
-                // accelerometer
-                let accParameter:[UInt8]  = [0x02, 0x02, 0x00, 0x01, 0x34, 0x00, 0x01, 0x01, 0x10, 0x00, 0x02, 0x01, 0x08, 0x00, 0x04, 0x01, 0x03]
-                let accData = NSData(bytes: accParameter, length: 17)
-                peripheral.writeValue(accData as Data, for: characteristic, type: CBCharacteristicWriteType.withResponse)
-                 */
-                
-                
-                // 02 02 00 01
-                // 34 00 01 01
-                // 10 00 02 01
-                // 08 00 04 01 03
-                
-                //let parameter:[UInt8]  = [0x02, 0x00, 0x00, 0x01, 0x82, 0x00, 0x01, 0x01, 0x0E, 0x00]
-                
-                // Accelerometer 2 bit
-                //let parameter:[UInt8]  = [0x02, 0x02]
-        
-                //peripheral.writeValue(data as Data, for: characteristic, type: CBCharacteristicWriteType.withResponse)
             }
         }
     }
+    
     func peripheral(_ peripheral: CBPeripheral, didWriteValueFor characteristic: CBCharacteristic, error: Error?) {
         if let error = error {
             print("Error writing value to characteristic: \(error)")
             return
         }
 
-        // Check if this is the response to the gyroscope configuration
-        if characteristic.uuid == GATTCommand { // Replace GATTCommand with the actual characteristic UUID if needed
-            // Now that gyroscope configuration is confirmed, write the accelerometer configuration
+        if characteristic.uuid == GATTCommand {
             let accParameter: [UInt8] = [0x02, 0x02, 0x00, 0x01, 0x34, 0x00, 0x01, 0x01, 0x10, 0x00, 0x02, 0x01, 0x08, 0x00, 0x04, 0x01, 0x03]
             let accData = Data(bytes: accParameter, count: accParameter.count)
 
