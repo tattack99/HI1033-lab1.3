@@ -12,6 +12,8 @@
 		94D232972B29A60F00A54EEB /* StartScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94D232962B29A60F00A54EEB /* StartScreen.swift */; };
 		94D232992B29A62600A54EEB /* InternalSensorScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94D232982B29A62600A54EEB /* InternalSensorScreen.swift */; };
 		94D2329B2B29A6A100A54EEB /* BluetoothListScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94D2329A2B29A6A100A54EEB /* BluetoothListScreen.swift */; };
+		94D232A12B29F23200A54EEB /* DGCharts in Frameworks */ = {isa = PBXBuildFile; productRef = 94D232A02B29F23200A54EEB /* DGCharts */; };
+		94D232A42B29F37600A54EEB /* ChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94D232A32B29F37600A54EEB /* ChartView.swift */; };
 		CE313C462B26F19200DCFA94 /* lab1_3App.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE313C452B26F19200DCFA94 /* lab1_3App.swift */; };
 		CE313C482B26F19200DCFA94 /* Persistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE313C472B26F19200DCFA94 /* Persistence.swift */; };
 		CE313C4B2B26F19200DCFA94 /* lab1_3.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = CE313C492B26F19200DCFA94 /* lab1_3.xcdatamodeld */; };
@@ -31,6 +33,7 @@
 		94D232962B29A60F00A54EEB /* StartScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StartScreen.swift; sourceTree = "<group>"; };
 		94D232982B29A62600A54EEB /* InternalSensorScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InternalSensorScreen.swift; sourceTree = "<group>"; };
 		94D2329A2B29A6A100A54EEB /* BluetoothListScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothListScreen.swift; sourceTree = "<group>"; };
+		94D232A32B29F37600A54EEB /* ChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartView.swift; sourceTree = "<group>"; };
 		CE313C422B26F19200DCFA94 /* lab1.3.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = lab1.3.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CE313C452B26F19200DCFA94 /* lab1_3App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = lab1_3App.swift; sourceTree = "<group>"; };
 		CE313C472B26F19200DCFA94 /* Persistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Persistence.swift; sourceTree = "<group>"; };
@@ -51,6 +54,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				94D232A12B29F23200A54EEB /* DGCharts in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -74,6 +78,14 @@
 				94D2329A2B29A6A100A54EEB /* BluetoothListScreen.swift */,
 			);
 			path = screens;
+			sourceTree = "<group>";
+		};
+		94D232A22B29F35200A54EEB /* views */ = {
+			isa = PBXGroup;
+			children = (
+				94D232A32B29F37600A54EEB /* ChartView.swift */,
+			);
+			path = views;
 			sourceTree = "<group>";
 		};
 		CE313C392B26F19200DCFA94 = {
@@ -116,6 +128,7 @@
 		CE313C5B2B270E8500DCFA94 /* views */ = {
 			isa = PBXGroup;
 			children = (
+				94D232A22B29F35200A54EEB /* views */,
 				94D232952B29A5FE00A54EEB /* screens */,
 				CE313C4C2B26F19200DCFA94 /* ContentView.swift */,
 				CE6B5C762B284E0B008B7FC6 /* TestScreen.swift */,
@@ -177,6 +190,9 @@
 			dependencies = (
 			);
 			name = lab1.3;
+			packageProductDependencies = (
+				94D232A02B29F23200A54EEB /* DGCharts */,
+			);
 			productName = lab1.3;
 			productReference = CE313C422B26F19200DCFA94 /* lab1.3.app */;
 			productType = "com.apple.product-type.application";
@@ -205,6 +221,9 @@
 				Base,
 			);
 			mainGroup = CE313C392B26F19200DCFA94;
+			packageReferences = (
+				94D2329F2B29F23200A54EEB /* XCRemoteSwiftPackageReference "Charts" */,
+			);
 			productRefGroup = CE313C432B26F19200DCFA94 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -239,6 +258,7 @@
 				94D232972B29A60F00A54EEB /* StartScreen.swift in Sources */,
 				CE6B5C772B284E0B008B7FC6 /* TestScreen.swift in Sources */,
 				94D232992B29A62600A54EEB /* InternalSensorScreen.swift in Sources */,
+				94D232A42B29F37600A54EEB /* ChartView.swift in Sources */,
 				CE313C482B26F19200DCFA94 /* Persistence.swift in Sources */,
 				CE313C4D2B26F19200DCFA94 /* ContentView.swift in Sources */,
 				94D232942B29A5C100A54EEB /* DataProcessor.swift in Sources */,
@@ -458,6 +478,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		94D2329F2B29F23200A54EEB /* XCRemoteSwiftPackageReference "Charts" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/danielgindi/Charts";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		94D232A02B29F23200A54EEB /* DGCharts */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 94D2329F2B29F23200A54EEB /* XCRemoteSwiftPackageReference "Charts" */;
+			productName = DGCharts;
+		};
+/* End XCSwiftPackageProductDependency section */
 
 /* Begin XCVersionGroup section */
 		CE313C492B26F19200DCFA94 /* lab1_3.xcdatamodeld */ = {

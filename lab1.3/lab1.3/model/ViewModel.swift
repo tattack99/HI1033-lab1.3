@@ -8,21 +8,23 @@
 import Foundation
 import CoreData
 import CoreBluetooth
-
+import Combine
 // Our device: C07A572F
 
 class ViewModel : ObservableObject{
     
     @Published var items: [MyItem] = []
     @Published var bluetoothDevices: [CBPeripheral] = []
-    
+    @Published var chartData: [ChartData] = []
     private var model : Model
-    
+    private var cancellables = Set<AnyCancellable>()
+
     
     
     init(){
         model = Model()
         loadItems()
+        initChartData()
         initExternalBluetooth()
     }
     
@@ -53,6 +55,22 @@ class ViewModel : ObservableObject{
     
     func connectToBluetoothDevice(to peripheral: CBPeripheral) {
         model.connectToPeripheral(peripheral)
+    }
+    
+    func startInternalSensor(){
+        model.startInternalSensor()
+    }
+    
+    func stopInternalSensor(){
+        model.stopInternalSensor()
+    }
+    
+    private func initChartData(){
+        model.$chartData
+           .sink { [weak self] newChartData in
+               self?.chartData = newChartData
+           }
+           .store(in: &cancellables)
     }
     
     private func initExternalBluetooth() {

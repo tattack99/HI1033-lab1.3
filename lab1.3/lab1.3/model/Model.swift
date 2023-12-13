@@ -8,17 +8,27 @@
 import Foundation
 import CoreData
 import CoreBluetooth
+import Combine
 
 class Model {
     
     private var polar: BluetoothConnect
     private var storage : PersistenceController
+    private var internalSensor: MotionManagerModel
+    private var time = 0
+    private var cancellables = Set<AnyCancellable>()
+
     
     @Published var discoveredPeripherals: [CBPeripheral] = []
+    
+    @Published var chartData: [ChartData] = []
     
     init() {
         polar = BluetoothConnect()
         storage = PersistenceController()
+        internalSensor = MotionManagerModel()
+        initChartData()
+        
         initBluetoothConnect()
     }
     
@@ -36,6 +46,23 @@ class Model {
     
     func connectToPeripheral(_ peripheral: CBPeripheral) {
         polar.connectToPeripheral(peripheral)
+    }
+    
+    func startInternalSensor(){
+        internalSensor.startMotionUpdates()
+    }
+    
+    func stopInternalSensor(){
+        internalSensor.stopMotionUpdates()
+    }
+    
+    
+    private func initChartData(){
+        internalSensor.$chartData
+            .sink { [weak self] newChartData in
+                self?.chartData = newChartData
+            }
+            .store(in: &cancellables)
     }
     
     private func initBluetoothConnect(){
