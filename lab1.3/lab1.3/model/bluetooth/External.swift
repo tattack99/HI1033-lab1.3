@@ -23,6 +23,8 @@ class BluetoothConnect: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
     var gyroData: SensorData
     var peripherals: [CBPeripheral]
     var onPeripheralDiscovered: ((CBPeripheral) -> Void)?
+    var onPeripheralStateChanged: ((CBPeripheralState) -> Void)?
+    var onBluetoothStatusChanged: ((CBManagerState) -> Void)?
 
     let GATTService = CBUUID(string: "fb005c80-02e7-f387-1cad-8acd2d8df0c8")
     let GATTCommand = CBUUID(string: "fb005c81-02e7-f387-1cad-8acd2d8df0c8")
@@ -39,6 +41,8 @@ class BluetoothConnect: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
     }
     
     func centralManagerDidUpdateState(_ central: CBCentralManager) {
+        self.onBluetoothStatusChanged?(central.state)
+        
         switch central.state {
           case .unknown:
             print("central.state is .unknown")
@@ -57,6 +61,7 @@ class BluetoothConnect: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
             print("unknown")
         }
     }
+
     
     func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi RSSI: NSNumber) {
         //print("Discover")
@@ -71,19 +76,30 @@ class BluetoothConnect: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
         }
     }
     
-    func connectToPeripheral(_ peripheral: CBPeripheral) {
-        print("Connect to Peripheral: \(String(describing: peripheral.name))")
-        self.peripheralBLE = peripheral
-        self.peripheralBLE?.delegate = self
-        self.centralManager?.connect(peripheralBLE!, options: nil)
-        self.centralManager.stopScan()
-    }
-    
     func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
         print("Connected")
         peripheral.discoverServices(nil)
         central.scanForPeripherals(withServices: [GATTService], options: nil)
+        onPeripheralStateChanged?(.connected)
     }
+    
+    func connectToPeripheral(_ peripheral: CBPeripheral) {
+        print("Connect to Peripheral: \(String(describing: peripheral.name))")
+        onPeripheralStateChanged?(.connecting)
+        self.peripheralBLE = peripheral
+        self.peripheralBLE?.delegate = self
+        self.centralManager?.connect(peripheralBLE!, options: nil)
+        self.centralManager.stopScan()
+        
+    }
+    
+    func peripheral(_ peripheral: CBPeripheral, didUpdateState newState: CBPeripheralState) {
+        onPeripheralStateChanged?(peripheral.state)
+    }
+    func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
+        onPeripheralStateChanged?(.disconnected)
+    }
+
     
     func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
          for service in peripheral.services!{

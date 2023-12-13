@@ -8,6 +8,8 @@
 import Foundation
 import CoreData
 import CoreBluetooth
+import Combine
+
 
 // Our device: C07A572F
 
@@ -15,10 +17,15 @@ class ViewModel : ObservableObject{
     
     @Published var items: [MyItem] = []
     @Published var bluetoothDevices: [CBPeripheral] = []
+    @Published var bluetoothStatus : String = "unknown"
+    @Published var showAlert = false
+    @Published var alertMessage = ""
     
     private var model : Model
-    
-    
+    private var cancellables = Set<AnyCancellable>()
+    private var hasConnectedOnce = false // Flag to track if connected once
+
+
     
     init(){
         model = Model()
@@ -59,7 +66,34 @@ class ViewModel : ObservableObject{
         model.$discoveredPeripherals
             .receive(on: RunLoop.main)
             .assign(to: &$bluetoothDevices)
+        model.$bluetoothStatus.map { status in
+                        switch status {
+                            case .poweredOn:
+                                return "Bluetooth is On"
+                            case .poweredOff:
+                                return "Bluetooth is Off"
+                            case .unauthorized:
+                                return "Bluetooth is Unauthorized"
+                            default:
+                                return "Bluetooth State: \(status)"
+                        }
+                    }
+                    .receive(on: RunLoop.main)
+                    .assign(to: &$bluetoothStatus)
+        model.$peripheralState
+            .receive(on: RunLoop.main)
+            .sink { [weak self] state in
+                
+                if state == .connecting {
+                    self?.hasConnectedOnce = true
+                    print("connect to device!!!")
+                } else if state == .disconnected && self?.hasConnectedOnce == true {
+                    self?.alertMessage = "Polar device disconnected."
+                    self?.showAlert = true
+                }
+            }
+            .store(in: &cancellables)
+
         }
-        
 }
 

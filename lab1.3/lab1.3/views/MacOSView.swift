@@ -11,13 +11,20 @@ struct MacOSView: View {
     @EnvironmentObject var viewModel: ViewModel
     
     var body: some View {
-        List(viewModel.bluetoothDevices, id: \.identifier) { device in
-            Button(action: {
-                viewModel.connectToBluetoothDevice(to: device)
-            }) {
-                Text(device.name ?? "Unknown Device")
+        VStack{
+            Text(viewModel.bluetoothStatus)
+            List(viewModel.bluetoothDevices, id: \.identifier) { device in
+                Button(action: {
+                    viewModel.connectToBluetoothDevice(to: device)
+                }) {
+                    Text(device.name ?? "Unknown Device")
+                }
+            }
+            .alert(isPresented: $viewModel.showAlert) {
+                Alert(title: Text("Connection Error"), message: Text(viewModel.alertMessage), dismissButton: .default(Text("OK")))
             }
         }
+        
     }
     
     struct MacOSView_Previews: PreviewProvider {
