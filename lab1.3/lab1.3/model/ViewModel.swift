@@ -31,7 +31,7 @@ class ViewModel : ObservableObject{
         model = Model()
         loadItems()
         initExternalBluetooth()
-        saveCSV(csvString: "String", filename: "fileName")
+        saveCSV(csvString: initMockDataCSV(), filename: "data.csv")
     }
     
     func loadItems() {
@@ -64,16 +64,6 @@ class ViewModel : ObservableObject{
     }
     
     func saveCSV(csvString: String, filename: String) {
-        let data = [
-            ["Name", "Age", "City"],
-            ["Alice", "28", "New York"],
-            ["Bob", "22", "San Francisco"]
-        ]
-
-        let csvString = data.map { row in
-            row.joined(separator: ",")
-        }.joined(separator: "\n")
-        
         let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
         let fileURL = paths[0].appendingPathComponent(filename)
 
@@ -84,6 +74,19 @@ class ViewModel : ObservableObject{
         } catch {
             print("Error saving file: \(error)")
         }
+    }
+    
+    func initMockDataCSV() -> String {
+        let data = [
+            ["Name", "Age", "City"],
+            ["Alice", "28", "New York"],
+            ["Bob", "22", "San Francisco"]
+        ]
+
+        let csvString = data.map { row in
+            row.joined(separator: ",")
+        }.joined(separator: "\n")
+        return csvString
     }
     
     private func initExternalBluetooth() {
