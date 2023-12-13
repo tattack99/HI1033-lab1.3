@@ -10,9 +10,9 @@ import CoreBluetooth
 import SwiftUI
 
 struct SensorData {
-    var xValue: Float = 0.0
-    var yValue: Float = 0.0
-    var zValue: Float = 0.0
+    var x: Double = 0.0
+    var y: Double = 0.0
+    var z: Double = 0.0
 }
 
 class BluetoothConnect: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate {
@@ -197,27 +197,27 @@ class BluetoothConnect: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
                 switch measId {
                 case 2 :
                     print("2")
-                    self.accData.xValue = Float(xSample) / 4096.0
-                    self.accData.yValue = Float(ySample) / 4096.0
-                    self.accData.zValue = Float(zSample) / 4096.0
+                    self.accData.x = Double(xSample) / 4096.0
+                    self.accData.y = Double(ySample) / 4096.0
+                    self.accData.z = Double(zSample) / 4096.0
 
                     // Round to two decimal places
-                    self.accData.xValue = (self.accData.xValue * 100).rounded() / 100
-                    self.accData.yValue = (self.accData.yValue * 100).rounded() / 100
-                    self.accData.zValue = (self.accData.zValue * 100).rounded() / 100
-                    print("xDelta:\(self.accData.xValue) yDelta:\(self.accData.yValue) zDelta:\(self.accData.zValue)")
+                    self.accData.x = (self.accData.x * 100).rounded() / 100
+                    self.accData.y = (self.accData.y * 100).rounded() / 100
+                    self.accData.z = (self.accData.z * 100).rounded() / 100
+                    print("xDelta:\(self.accData.x) yDelta:\(self.accData.y) zDelta:\(self.accData.z)")
 
                 case 5 :
                     print("5")
-                    self.gyroData.xValue = Float(xSample) / 16.384
-                    self.gyroData.yValue = Float(ySample) / 16.384
-                    self.gyroData.zValue = Float(zSample) / 16.384
+                    self.gyroData.x = Double(xSample) / 16.384
+                    self.gyroData.y = Double(ySample) / 16.384
+                    self.gyroData.z = Double(zSample) / 16.384
 
                     // Round to two decimal places
-                    self.gyroData.xValue = (self.gyroData.xValue * 100).rounded() / 100
-                    self.gyroData.yValue = (self.gyroData.yValue * 100).rounded() / 100
-                    self.gyroData.zValue = (self.gyroData.zValue * 100).rounded() / 100
-                    print("xDelta:\(self.gyroData.xValue) yDelta:\(self.gyroData.yValue) zDelta:\(self.gyroData.zValue)")
+                    self.gyroData.x = (self.gyroData.x * 100).rounded() / 100
+                    self.gyroData.y = (self.gyroData.y * 100).rounded() / 100
+                    self.gyroData.z = (self.gyroData.z * 100).rounded() / 100
+                    print("xDelta:\(self.gyroData.x) yDelta:\(self.gyroData.y) zDelta:\(self.gyroData.z)")
 
                 default:
                     print("Other")
