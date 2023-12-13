@@ -24,8 +24,8 @@ class ViewModel : ObservableObject{
     @Published var bluetoothStatus : String = "unknown"
     @Published var showAlert = false
     @Published var alertMessage = ""
-    @Published var chartData: [ChartData] = []
-    
+    @Published var filteredData: [ChartData] = []
+    @Published var combinedData: [ChartData] = []
     
     
     
@@ -98,9 +98,15 @@ class ViewModel : ObservableObject{
     }
     
     private func initChartData(){
-        model.$chartData
+        model.$filteredData
             .sink { [weak self] newChartData in
-                self?.chartData = newChartData
+                self?.filteredData = newChartData
+            }
+            .store(in: &cancellables)
+        
+        model.$combinedData
+            .sink { [weak self] newChartData in
+                self?.combinedData = newChartData
             }
             .store(in: &cancellables)
     }

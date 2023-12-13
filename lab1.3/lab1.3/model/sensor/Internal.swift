@@ -14,9 +14,10 @@ class MotionManagerModel {
     private var lastAccelerometerOutput = SensorData(x: 0, y: 0, z: 0)
     private var lastGyroOutput = SensorData(x: 0, y: 0, z: 0)
     private var time = 0
-    private var maxTime = 0
-    @Published var chartData: [ChartData] = []
+    private var maxTime = 300
     
+    @Published var filteredData: [ChartData] = []
+    @Published var combinedData: [ChartData] = []
   
 
     func startMotionUpdates() {
@@ -25,8 +26,8 @@ class MotionManagerModel {
             return
         }
 
-        motionManager.accelerometerUpdateInterval = 1.0
-        motionManager.gyroUpdateInterval = 1.0
+        motionManager.accelerometerUpdateInterval = 0.1
+        motionManager.gyroUpdateInterval = 0.1
 
         startAccelerometerUpdates()
         startGyroUpdates()
@@ -47,16 +48,19 @@ class MotionManagerModel {
                 z:accelerometerData.acceleration.z
             )
 
-            let filteredData = dataProcessor.applyEwmaFilter(accelerationData, lastAccelerometerOutput)
+            let filtData = dataProcessor.applyEwmaFilter(accelerationData, lastAccelerometerOutput)
             
-            let angels = dataProcessor.calculateEulerAngles(filteredData)
+            let angels = dataProcessor.calculateEulerAngles(filtData)
             
-            lastAccelerometerOutput = filteredData
+            lastAccelerometerOutput = filtData
                 
-            print("Filtered: roll: \(Int(angels.roll )%360), pitch: \(Int(angels.pitch + 90)%360), yaw: \(angels.yaw)" )
+//            print("Filtered: roll: \(Int(angels.roll )%360), pitch: \(Int(angels.pitch + 90)%360), yaw: \(angels.yaw)" )
             let result = Int(angels.pitch + 90) % 360
-            chartData.append(ChartData(time: Double(time), degree: Double(result)))
+            filteredData.append(ChartData(time: Double(time), degree: Double(result)))
             time = time + 1
+            if(time >= maxTime){
+                stopMotionUpdates()
+            }
             
         }
 
@@ -76,11 +80,14 @@ class MotionManagerModel {
                 z:gyroData.rotationRate.z
             )
 
-            let combinedData = dataProcessor.applyComplementaryFilter(lastAccelerometerOutput, gyroOutput)
+            let combData = dataProcessor.applyComplementaryFilter(lastAccelerometerOutput, gyroOutput)
         
-            let angels = dataProcessor.calculateEulerAngles(combinedData)
+            let angels = dataProcessor.calculateEulerAngles(combData)
 
-            print("Combined: roll: \(Int(angels.roll)%360), pitch: \(Int(angels.pitch + 90)%360), yaw: \(angels.yaw)\n")
+//            print("Combined: roll: \(Int(angels.roll)%360), pitch: \(Int(angels.pitch + 90)%360), yaw: \(angels.yaw)\n")
+            
+            let result = Int(angels.pitch + 90) % 360
+            combinedData.append(ChartData(time: Double(time), degree: Double(result)))
         }
     }
 
@@ -90,6 +97,10 @@ class MotionManagerModel {
     func stopMotionUpdates(){
         motionManager.stopAccelerometerUpdates()
         motionManager.stopGyroUpdates()
+        // TODO save the data in presistence
+        combinedData = []
+        filteredData = []
+        time = 0
     }
     
     

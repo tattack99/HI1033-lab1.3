@@ -14,6 +14,8 @@
 		94D2329B2B29A6A100A54EEB /* BluetoothListScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94D2329A2B29A6A100A54EEB /* BluetoothListScreen.swift */; };
 		94D232A12B29F23200A54EEB /* DGCharts in Frameworks */ = {isa = PBXBuildFile; productRef = 94D232A02B29F23200A54EEB /* DGCharts */; };
 		94D232A42B29F37600A54EEB /* ChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94D232A32B29F37600A54EEB /* ChartView.swift */; };
+		94D232A62B2A180400A54EEB /* AngelsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94D232A52B2A180400A54EEB /* AngelsView.swift */; };
+		94D232A82B2A1A8C00A54EEB /* ChartHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94D232A72B2A1A8C00A54EEB /* ChartHeaderView.swift */; };
 		CE313C462B26F19200DCFA94 /* lab1_3App.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE313C452B26F19200DCFA94 /* lab1_3App.swift */; };
 		CE313C482B26F19200DCFA94 /* Persistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE313C472B26F19200DCFA94 /* Persistence.swift */; };
 		CE313C4B2B26F19200DCFA94 /* lab1_3.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = CE313C492B26F19200DCFA94 /* lab1_3.xcdatamodeld */; };
@@ -34,6 +36,8 @@
 		94D232982B29A62600A54EEB /* InternalSensorScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InternalSensorScreen.swift; sourceTree = "<group>"; };
 		94D2329A2B29A6A100A54EEB /* BluetoothListScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothListScreen.swift; sourceTree = "<group>"; };
 		94D232A32B29F37600A54EEB /* ChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartView.swift; sourceTree = "<group>"; };
+		94D232A52B2A180400A54EEB /* AngelsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AngelsView.swift; sourceTree = "<group>"; };
+		94D232A72B2A1A8C00A54EEB /* ChartHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartHeaderView.swift; sourceTree = "<group>"; };
 		CE313C422B26F19200DCFA94 /* lab1.3.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = lab1.3.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CE313C452B26F19200DCFA94 /* lab1_3App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = lab1_3App.swift; sourceTree = "<group>"; };
 		CE313C472B26F19200DCFA94 /* Persistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Persistence.swift; sourceTree = "<group>"; };
@@ -84,6 +88,8 @@
 			isa = PBXGroup;
 			children = (
 				94D232A32B29F37600A54EEB /* ChartView.swift */,
+				94D232A52B2A180400A54EEB /* AngelsView.swift */,
+				94D232A72B2A1A8C00A54EEB /* ChartHeaderView.swift */,
 			);
 			path = views;
 			sourceTree = "<group>";
@@ -250,7 +256,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				94D232A82B2A1A8C00A54EEB /* ChartHeaderView.swift in Sources */,
 				94D2329B2B29A6A100A54EEB /* BluetoothListScreen.swift in Sources */,
+				94D232A62B2A180400A54EEB /* AngelsView.swift in Sources */,
 				CE313C642B2714BF00DCFA94 /* Model.swift in Sources */,
 				CE313C5F2B27132900DCFA94 /* External.swift in Sources */,
 				CE6B5C7B2B28579B008B7FC6 /* MacOSView.swift in Sources */,

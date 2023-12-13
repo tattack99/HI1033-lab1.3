@@ -8,8 +8,6 @@
 import SwiftUI
 import Charts
 
-
-
 struct ChartData: Identifiable  {
     let id = UUID()
     var time: Double
@@ -17,17 +15,33 @@ struct ChartData: Identifiable  {
 }
 
 struct ChartView: View {
-    @Binding var chartData: [ChartData]
+
+    @EnvironmentObject var viewModel : ViewModel
     
     var body: some View {
-        Chart {
-            ForEach(chartData) { d in
-                LineMark(
-                    x: .value("Time", d.time),
-                    y: .value("Degree", d.degree)
-                )
+        GeometryReader { geometry in
+            Chart {
+                ForEach(viewModel.filteredData) { f in
+                    LineMark(
+                        x: .value("Time", f.time),
+                        y: .value("Degree", f.degree),
+                        series: .value("pm25", "A")
+                    )
+                    .foregroundStyle(.blue)
+                }
+
+                ForEach(viewModel.combinedData) { c in
+                    LineMark(
+                        x: .value("Time", c.time),
+                        y: .value("Degree", c.degree),
+                        series: .value("pm10", "B")
+                    )
+                    .foregroundStyle(.red)
+                }
             }
+//            .frame(height: geometry.size.height * 0.6) // Set the height to 50% of the available space
         }
     }
 }
+
 

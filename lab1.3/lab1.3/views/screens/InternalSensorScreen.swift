@@ -16,7 +16,20 @@ struct InternalSensorScreen: View {
     
     var body: some View {
         VStack{
-            ChartView(chartData: $viewModel.chartData)
+            
+            ChartHeaderView()
+            ChartView()
+            AngelsView()
+            Button(action: {
+                print("Exportig...")
+            }){
+                Text("Export result")
+                .padding()
+            }
+            .foregroundColor(.white)
+            .background(.blue)
+            .cornerRadius(10)
+            
             Text("Internal sensor")
         }
         .onAppear(perform: {

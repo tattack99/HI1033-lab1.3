@@ -22,7 +22,8 @@ class Model {
     @Published var discoveredPeripherals : [CBPeripheral] = []
     @Published var bluetoothStatus : CBManagerState = .unknown
     @Published var peripheralState: CBPeripheralState = .disconnected
-    @Published var chartData: [ChartData] = []
+    @Published var filteredData: [ChartData] = []
+    @Published var combinedData: [ChartData] = []
     
     init() {
         polar = BluetoothConnect()
@@ -58,9 +59,15 @@ class Model {
     
     
     private func initChartData(){
-        internalSensor.$chartData
+        internalSensor.$filteredData
             .sink { [weak self] newChartData in
-                self?.chartData = newChartData
+                self?.filteredData = newChartData
+            }
+            .store(in: &cancellables)
+        
+        internalSensor.$combinedData
+            .sink { [weak self] newChartData in
+                self?.combinedData = newChartData
             }
             .store(in: &cancellables)
     }
