@@ -14,22 +14,26 @@ import Combine
 // Our device: C07A572F
 
 class ViewModel : ObservableObject{
+    private var hasConnectedOnce = false // Flag to track if connected once
+    private var model : Model
+    private var cancellables = Set<AnyCancellable>()
+    
     
     @Published var items: [MyItem] = []
     @Published var bluetoothDevices: [CBPeripheral] = []
     @Published var bluetoothStatus : String = "unknown"
     @Published var showAlert = false
     @Published var alertMessage = ""
+    @Published var chartData: [ChartData] = []
     
-    private var model : Model
-    private var cancellables = Set<AnyCancellable>()
-    private var hasConnectedOnce = false // Flag to track if connected once
-
-
+    
+    
+    
     
     init(){
         model = Model()
         loadItems()
+        initChartData()
         initExternalBluetooth()
         saveCSV(csvString: "String", filename: "fileName")
     }
@@ -69,14 +73,14 @@ class ViewModel : ObservableObject{
             ["Alice", "28", "New York"],
             ["Bob", "22", "San Francisco"]
         ]
-
+        
         let csvString = data.map { row in
             row.joined(separator: ",")
         }.joined(separator: "\n")
         
         let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
         let fileURL = paths[0].appendingPathComponent(filename)
-
+        
         do {
             print("csvString: \(csvString)")
             try csvString.write(to: fileURL, atomically: true, encoding: .utf8)
@@ -85,25 +89,40 @@ class ViewModel : ObservableObject{
             print("Error saving file: \(error)")
         }
     }
+    func startInternalSensor(){
+        model.startInternalSensor()
+    }
+    
+    func stopInternalSensor(){
+        model.stopInternalSensor()
+    }
+    
+    private func initChartData(){
+        model.$chartData
+            .sink { [weak self] newChartData in
+                self?.chartData = newChartData
+            }
+            .store(in: &cancellables)
+    }
     
     private func initExternalBluetooth() {
         model.$discoveredPeripherals
             .receive(on: RunLoop.main)
             .assign(to: &$bluetoothDevices)
         model.$bluetoothStatus.map { status in
-                        switch status {
-                            case .poweredOn:
-                                return "Bluetooth is On"
-                            case .poweredOff:
-                                return "Bluetooth is Off"
-                            case .unauthorized:
-                                return "Bluetooth is Unauthorized"
-                            default:
-                                return "Bluetooth State: \(status)"
-                        }
-                    }
-                    .receive(on: RunLoop.main)
-                    .assign(to: &$bluetoothStatus)
+            switch status {
+            case .poweredOn:
+                return "Bluetooth is On"
+            case .poweredOff:
+                return "Bluetooth is Off"
+            case .unauthorized:
+                return "Bluetooth is Unauthorized"
+            default:
+                return "Bluetooth State: \(status)"
+            }
+        }
+        .receive(on: RunLoop.main)
+        .assign(to: &$bluetoothStatus)
         model.$peripheralState
             .receive(on: RunLoop.main)
             .sink { [weak self] state in
@@ -117,7 +136,8 @@ class ViewModel : ObservableObject{
                 }
             }
             .store(in: &cancellables)
-
+        
     }
 }
+    
 

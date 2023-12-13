@@ -7,22 +7,26 @@
 
 
 import SwiftUI
+import Combine
 
 struct InternalSensorScreen: View {
-    let model = MotionManagerModel()
+    @EnvironmentObject var viewModel : ViewModel
+
+  
+    
     var body: some View {
-        Text("Internal sensor")
-            .onAppear(perform: {
-                model.startMotionUpdates()
-            })
-            .onDisappear(perform: {
-                model.stopMotionUpdates()
-            })
+        VStack{
+            ChartView(chartData: $viewModel.chartData)
+            Text("Internal sensor")
+        }
+        .onAppear(perform: {
+            viewModel.startInternalSensor()
+        })
+        .onDisappear(perform: {
+            viewModel.stopInternalSensor()
+        })
     }
+    
+
 }
 
-struct InternalSensorScreen_Previews: PreviewProvider {
-    static var previews: some View {
-        InternalSensorScreen()
-    }
-}

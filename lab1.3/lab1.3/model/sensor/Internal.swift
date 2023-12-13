@@ -13,7 +13,9 @@ class MotionManagerModel {
     private let dataProcessor = DataProcessor()
     private var lastAccelerometerOutput = SensorData(x: 0, y: 0, z: 0)
     private var lastGyroOutput = SensorData(x: 0, y: 0, z: 0)
-
+    private var time = 0
+    private var maxTime = 0
+    @Published var chartData: [ChartData] = []
     
   
 
@@ -31,6 +33,7 @@ class MotionManagerModel {
     }
 
     private func startAccelerometerUpdates() {
+   
         motionManager.startAccelerometerUpdates(to: OperationQueue.current!) { [weak self] (data, error) in
             guard let self = self, let accelerometerData = data, error == nil else {
                 print("Error: \(error!)")
@@ -51,9 +54,12 @@ class MotionManagerModel {
             lastAccelerometerOutput = filteredData
                 
             print("Filtered: roll: \(Int(angels.roll )%360), pitch: \(Int(angels.pitch + 90)%360), yaw: \(angels.yaw)" )
-            
+            let result = Int(angels.pitch + 90) % 360
+            chartData.append(ChartData(time: Double(time), degree: Double(result)))
+            time = time + 1
             
         }
+
     }
 
     private func startGyroUpdates() {
