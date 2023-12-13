@@ -18,8 +18,8 @@ struct InternalSensorScreen: View {
         VStack{
             
             ChartHeaderView()
-            ChartView()
-            AngelsView()
+            ChartView(combinedData: viewModel.combinedData, filteredData: viewModel.filteredData)
+            AngelsView(combinedData: viewModel.combinedData, filteredData: viewModel.filteredData)
             Button(action: {
                 print("Exportig...")
             }){

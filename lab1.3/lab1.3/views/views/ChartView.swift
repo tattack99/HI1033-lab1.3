@@ -16,12 +16,13 @@ struct ChartData: Identifiable  {
 
 struct ChartView: View {
 
-    @EnvironmentObject var viewModel : ViewModel
-    
+    var combinedData: [ChartData]
+    var filteredData: [ChartData]
+        
     var body: some View {
         GeometryReader { geometry in
             Chart {
-                ForEach(viewModel.filteredData) { f in
+                ForEach(filteredData) { f in
                     LineMark(
                         x: .value("Time", f.time),
                         y: .value("Degree", f.degree),
@@ -30,7 +31,7 @@ struct ChartView: View {
                     .foregroundStyle(.blue)
                 }
 
-                ForEach(viewModel.combinedData) { c in
+                ForEach(combinedData) { c in
                     LineMark(
                         x: .value("Time", c.time),
                         y: .value("Degree", c.degree),

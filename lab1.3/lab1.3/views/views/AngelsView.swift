@@ -8,22 +8,23 @@
 import SwiftUI
 
 struct AngelsView: View {
-    @EnvironmentObject var viewModel: ViewModel
-    
+    var combinedData: [ChartData]
+    var filteredData: [ChartData]
+        
     var body: some View {
-        HStack{
+        HStack {
             Spacer()
-            if let lastCombinedData = viewModel.combinedData.last {
-                    Text("\(Int(lastCombinedData.degree))°").font(.system(size: 80))
-                } else {
-                    Text("No combined data").font(.title)
-                }
-                Spacer()
-                if let lastFilteredData = viewModel.filteredData.last {
-                    Text("\(Int(lastFilteredData.degree))°").font(.system(size: 80))
-                } else {
-                    Text("No filtered data").font(.title)
-                }
+            if let lastCombinedData = combinedData.last {
+                Text("\(Int(lastCombinedData.degree))°").font(.system(size: 80))
+            } else {
+                Text("No combined data").font(.title)
+            }
+            Spacer()
+            if let lastFilteredData = filteredData.last {
+                Text("\(Int(lastFilteredData.degree))°").font(.system(size: 80))
+            } else {
+                Text("No filtered data").font(.title)
+            }
             Spacer()
         }
     }
