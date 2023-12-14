@@ -111,7 +111,8 @@ class MotionManagerModel: ObservableObject {
       }
 
       private func timerElapsed() -> Bool {
-          return filteredData.count * Int(updatedInterval) >= Int(duration)
+          let limit = duration / updatedInterval
+          return filteredData.count >= Int(limit)
       }
  
 
