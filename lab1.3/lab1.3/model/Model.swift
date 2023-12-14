@@ -14,6 +14,7 @@ class Model: ObservableObject {
     
     private var polar: BluetoothConnect
     private var storage : PersistenceController
+    private var fileMangaer : FileManageModel
     @Published private var internalSensor: MotionManagerModel
     private var time = 0
     private var cancellables = Set<AnyCancellable>()
@@ -29,6 +30,7 @@ class Model: ObservableObject {
         polar = BluetoothConnect()
         storage = PersistenceController()
         internalSensor = MotionManagerModel()
+        fileMangaer = FileManageModel()
         initChartData()
         initBluetoothConnect()
     }
@@ -63,6 +65,17 @@ class Model: ObservableObject {
         return internalSensor.isOver
     }
     
+    func listFilesFromDocumentsFolder() -> [String] {
+        fileMangaer.listFilesFromDocumentsFolder()
+    }
+    
+    func readChartData(_ fileName: String) -> [ChartData] {
+        fileMangaer.readChartData(fileName)
+    }
+    
+    func saveCSV(chartDataArray: [ChartData]) {
+        fileMangaer.saveCSV(chartDataArray: chartDataArray)
+    }
     
     private func initChartData(){
         internalSensor.$filteredData

@@ -20,27 +20,24 @@ struct ChartView: View {
     var filteredData: [ChartData]
         
     var body: some View {
-        GeometryReader { geometry in
-            Chart {
-                ForEach(filteredData) { f in
-                    LineMark(
-                        x: .value("Time", f.time),
-                        y: .value("Degree", f.degree),
-                        series: .value("pm25", "A")
-                    )
-                    .foregroundStyle(.blue)
-                }
-
-                ForEach(combinedData) { c in
-                    LineMark(
-                        x: .value("Time", c.time),
-                        y: .value("Degree", c.degree),
-                        series: .value("pm10", "B")
-                    )
-                    .foregroundStyle(.red)
-                }
+        Chart {
+            ForEach(filteredData) { f in
+                LineMark(
+                    x: .value("Time", f.time),
+                    y: .value("Degree", f.degree),
+                    series: .value("pm25", "A")
+                )
+                .foregroundStyle(.blue)
             }
-//            .frame(height: geometry.size.height * 0.6) // Set the height to 50% of the available space
+
+            ForEach(combinedData) { c in
+                LineMark(
+                    x: .value("Time", c.time),
+                    y: .value("Degree", c.degree),
+                    series: .value("pm10", "B")
+                )
+                .foregroundStyle(.red)
+            }
         }
     }
 }

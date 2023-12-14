@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		942DC12C2B2B498100067570 /* FileListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 942DC12B2B2B498100067570 /* FileListView.swift */; };
+		942DC12E2B2B5C9B00067570 /* FileManageModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 942DC12D2B2B5C9B00067570 /* FileManageModel.swift */; };
 		943B70142B2B2133005C9739 /* AppButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 943B70132B2B2133005C9739 /* AppButtonView.swift */; };
 		94D232922B29A5AC00A54EEB /* Internal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94D232912B29A5AC00A54EEB /* Internal.swift */; };
 		94D232942B29A5C100A54EEB /* DataProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94D232932B29A5C100A54EEB /* DataProcessor.swift */; };
@@ -31,6 +33,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		942DC12B2B2B498100067570 /* FileListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileListView.swift; sourceTree = "<group>"; };
+		942DC12D2B2B5C9B00067570 /* FileManageModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileManageModel.swift; sourceTree = "<group>"; };
 		943B70132B2B2133005C9739 /* AppButtonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppButtonView.swift; sourceTree = "<group>"; };
 		94D232912B29A5AC00A54EEB /* Internal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Internal.swift; sourceTree = "<group>"; };
 		94D232932B29A5C100A54EEB /* DataProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataProcessor.swift; sourceTree = "<group>"; };
@@ -72,6 +76,7 @@
 			children = (
 				94D232912B29A5AC00A54EEB /* Internal.swift */,
 				94D232932B29A5C100A54EEB /* DataProcessor.swift */,
+				942DC12D2B2B5C9B00067570 /* FileManageModel.swift */,
 			);
 			path = sensor;
 			sourceTree = "<group>";
@@ -93,6 +98,7 @@
 				94D232A52B2A180400A54EEB /* AngelsView.swift */,
 				94D232A72B2A1A8C00A54EEB /* ChartHeaderView.swift */,
 				943B70132B2B2133005C9739 /* AppButtonView.swift */,
+				942DC12B2B2B498100067570 /* FileListView.swift */,
 			);
 			path = views;
 			sourceTree = "<group>";
@@ -265,6 +271,7 @@
 				94D232A62B2A180400A54EEB /* AngelsView.swift in Sources */,
 				CE313C642B2714BF00DCFA94 /* Model.swift in Sources */,
 				CE313C5F2B27132900DCFA94 /* External.swift in Sources */,
+				942DC12E2B2B5C9B00067570 /* FileManageModel.swift in Sources */,
 				CE6B5C7B2B28579B008B7FC6 /* MacOSView.swift in Sources */,
 				CE313C462B26F19200DCFA94 /* lab1_3App.swift in Sources */,
 				94D232972B29A60F00A54EEB /* StartScreen.swift in Sources */,
@@ -275,6 +282,7 @@
 				CE313C4D2B26F19200DCFA94 /* ContentView.swift in Sources */,
 				94D232942B29A5C100A54EEB /* DataProcessor.swift in Sources */,
 				94D232922B29A5AC00A54EEB /* Internal.swift in Sources */,
+				942DC12C2B2B498100067570 /* FileListView.swift in Sources */,
 				CE313C612B2713AA00DCFA94 /* ViewModel.swift in Sources */,
 				CE313C4B2B26F19200DCFA94 /* lab1_3.xcdatamodeld in Sources */,
 			);

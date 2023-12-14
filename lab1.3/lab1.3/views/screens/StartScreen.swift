@@ -8,9 +8,19 @@
 import SwiftUI
 
 struct StartScreen: View {
+    @State private var showShareSheet = false
+
     var body: some View {
         NavigationView{
             VStack{
+                HStack{
+                    AppButtonView(title: "History", action: {showShareSheet = true})
+                    .sheet(isPresented: $showShareSheet) {
+                        FileListView()
+                    }
+                }
+                
+                Spacer()
                 
                 Text("What sensor do you want to use: ")
                 
@@ -32,6 +42,7 @@ struct StartScreen: View {
                     .background(.blue)
                     .cornerRadius(10)
                 }
+                Spacer()
             }
         }
     }

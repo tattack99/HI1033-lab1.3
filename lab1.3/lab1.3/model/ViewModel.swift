@@ -35,7 +35,6 @@ class ViewModel : ObservableObject{
         loadItems()
         initChartData()
         initExternalBluetooth()
-        saveCSV(csvString: "String", filename: "fileName")
     }
     
     func loadItems() {
@@ -67,28 +66,22 @@ class ViewModel : ObservableObject{
         model.connectToPeripheral(peripheral)
     }
     
-    func saveCSV(csvString: String, filename: String) {
-        let data = [
-            ["Name", "Age", "City"],
-            ["Alice", "28", "New York"],
-            ["Bob", "22", "San Francisco"]
-        ]
-        
-        let csvString = data.map { row in
-            row.joined(separator: ",")
-        }.joined(separator: "\n")
-        
-        let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
-        let fileURL = paths[0].appendingPathComponent(filename)
-        
-        do {
-            print("csvString: \(csvString)")
-            try csvString.write(to: fileURL, atomically: true, encoding: .utf8)
-            print("CSV file saved: \(fileURL)")
-        } catch {
-            print("Error saving file: \(error)")
-        }
+    
+  
+    func saveCSV(chartDataArray: [ChartData]) {
+        model.saveCSV(chartDataArray: chartDataArray)
     }
+
+    
+    func listFilesFromDocumentsFolder() -> [String] {
+        return model.listFilesFromDocumentsFolder()
+    }
+    
+    func readChartData(from fileName: String) -> [ChartData] {
+        return model.readChartData(fileName)
+    }
+    
+    
     func startInternalSensor(){
         model.startInternalSensor()
     }

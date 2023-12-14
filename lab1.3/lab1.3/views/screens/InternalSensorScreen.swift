@@ -11,7 +11,8 @@ import Combine
 
 struct InternalSensorScreen: View {
     @EnvironmentObject var viewModel : ViewModel
-
+    @State private var showShareSheet = false
+    @State private var fileURL: URL?
   
     
     var body: some View {
@@ -30,8 +31,18 @@ struct InternalSensorScreen: View {
             }else
             {
                 AppButtonView(title: "Export reuslt", action: {
-                    print("Exporting...")
+                    viewModel.saveCSV(chartDataArray: viewModel.filteredData)
+                    showShareSheet = true
+                    // Get the file URL for test
+//                    let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
+//                    fileURL = paths[0].appendingPathComponent(filename)
+                    
+ 
                 })
+                .sheet(isPresented: $showShareSheet) {
+
+                    FileListView()
+                }
             }
 
             Text("Internal sensor")
