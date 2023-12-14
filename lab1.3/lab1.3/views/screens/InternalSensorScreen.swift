@@ -16,8 +16,7 @@ struct InternalSensorScreen: View {
   
     
     var body: some View {
-        VStack{
-            
+        VStack{            
             ChartHeaderView()
             ChartView(combinedData: viewModel.combinedData, filteredData: viewModel.filteredData)
             AngelsView(combinedData: viewModel.combinedData, filteredData: viewModel.filteredData)

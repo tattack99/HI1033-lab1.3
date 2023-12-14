@@ -26,7 +26,7 @@ class BluetoothConnect: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
     var onPeripheralStateChanged: ((CBPeripheralState) -> Void)?
     var onBluetoothStatusChanged: ((CBManagerState) -> Void)?
     
-    @Published var isOver = false
+    @Published var isOver = true
     @Published var filteredData: [ChartData] = []
     @Published var combinedData: [ChartData] = []
     private var startTime: Date?
@@ -153,7 +153,7 @@ class BluetoothConnect: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
 
     
     func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic,error: Error?) {
-        guard isOver else { return }
+        guard !isOver else { return }
         
         print("New data")
         let data = characteristic.value
@@ -224,7 +224,6 @@ class BluetoothConnect: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
                     let rawAccData = SensorData(x: Double(xSample) / 4096.0, y: Double(ySample) / 4096.0, z: Double(zSample) / 4096.0)
                     self.processAccData(sensorData : rawAccData)
                 case 5 :
-                    
                     let rawAccData = SensorData(x: Double(xSample) / 16.384, y: Double(ySample) / 16.384, z: Double(zSample) / 16.384)
                     self.processGyroData(sensorData : rawAccData)
                     
@@ -237,7 +236,7 @@ class BluetoothConnect: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
     
     func processAccData(sensorData : SensorData){
         let filteredAccData = dataProcessor.applyEwmaFilter(sensorData, self.accData)
-        self.accData = filteredAccData
+        self.accData = sensorData
         let angles = dataProcessor.calculateEulerAngles(filteredAccData)
 
         self.accData = sensorData
@@ -250,18 +249,21 @@ class BluetoothConnect: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
         
         let combData = dataProcessor.applyComplementaryFilter(self.accData, sensorData)
         let angels = dataProcessor.calculateEulerAngles(combData)
+        
         let result = Int(angels.pitch + 90) % 360
         let elapsedTime = Date().timeIntervalSince(self.startTime ?? Date())
         combinedData.append(ChartData(time: Double(elapsedTime), degree: Double(result)))
+        
+        self.gyroData = sensorData
     }
     
     func startExternalSensor(){
-        isOver = true
+        isOver = false
     }
 
     
     func stopExternalSensor(){
-        isOver = false
+        isOver = true
     }
 
     

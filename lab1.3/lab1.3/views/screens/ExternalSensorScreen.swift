@@ -15,6 +15,8 @@ struct ExternalSensorScreen: View {
     var body: some View {
         VStack{
             
+            Text("Size_Filter:\(viewModel.filteredData.count), Size_Combo:\(viewModel.combinedData.count)")
+
             ChartHeaderView()
             ChartView(combinedData: viewModel.combinedData, filteredData: viewModel.filteredData)
             AngelsView(combinedData: viewModel.combinedData, filteredData: viewModel.filteredData)
