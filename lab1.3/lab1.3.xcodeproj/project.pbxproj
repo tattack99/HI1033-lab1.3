@@ -76,6 +76,7 @@
 		94D232902B29A59000A54EEB /* sensor */ = {
 			isa = PBXGroup;
 			children = (
+				CE313C5E2B27132900DCFA94 /* External.swift */,
 				94D232912B29A5AC00A54EEB /* Internal.swift */,
 				94D232932B29A5C100A54EEB /* DataProcessor.swift */,
 				942DC12D2B2B5C9B00067570 /* FileManageModel.swift */,
@@ -187,7 +188,6 @@
 		CE313C652B272C1F00DCFA94 /* bluetooth */ = {
 			isa = PBXGroup;
 			children = (
-				CE313C5E2B27132900DCFA94 /* External.swift */,
 			);
 			path = bluetooth;
 			sourceTree = "<group>";

@@ -100,6 +100,20 @@ class ViewModel : ObservableObject{
         return model.isOver()
     }
     
+    func startExternalSensor(){
+        model.startExternalSensor()
+    }
+  
+    
+    func stopExternalSensor(){
+        model.stopExternalSensor()
+    }
+    
+  
+    func isOverExternal() -> Bool {
+        return model.isOverExternal()
+    }
+    
     
     private func initChartData(){
         model.$filteredData
@@ -146,6 +160,7 @@ class ViewModel : ObservableObject{
                 }
             }
             .store(in: &cancellables)
+        
         
     }
 }

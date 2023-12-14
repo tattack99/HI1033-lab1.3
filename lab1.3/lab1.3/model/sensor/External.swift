@@ -25,7 +25,15 @@ class BluetoothConnect: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
     var onPeripheralDiscovered: ((CBPeripheral) -> Void)?
     var onPeripheralStateChanged: ((CBPeripheralState) -> Void)?
     var onBluetoothStatusChanged: ((CBManagerState) -> Void)?
+    
+    @Published var isOver = false
+    @Published var filteredData: [ChartData] = []
+    @Published var combinedData: [ChartData] = []
+    private var startTime: Date?
+    private var timer: DispatchSourceTimer?
+    private let dataProcessor = DataProcessor()
 
+    
     let GATTService = CBUUID(string: "fb005c80-02e7-f387-1cad-8acd2d8df0c8")
     let GATTCommand = CBUUID(string: "fb005c81-02e7-f387-1cad-8acd2d8df0c8")
     let GATTData = CBUUID(string:    "fb005c82-02e7-f387-1cad-8acd2d8df0c8")
@@ -144,8 +152,9 @@ class BluetoothConnect: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
     }
 
     
-    func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic,
-                    error: Error?) {
+    func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic,error: Error?) {
+        guard isOver else { return }
+        
         print("New data")
         let data = characteristic.value
         var byteArray: [UInt8] = []
@@ -212,34 +221,52 @@ class BluetoothConnect: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
                 
                 switch measId {
                 case 2 :
-                    print("2")
-                    self.accData.x = Double(xSample) / 4096.0
-                    self.accData.y = Double(ySample) / 4096.0
-                    self.accData.z = Double(zSample) / 4096.0
-
-                    // Round to two decimal places
-                    self.accData.x = (self.accData.x * 100).rounded() / 100
-                    self.accData.y = (self.accData.y * 100).rounded() / 100
-                    self.accData.z = (self.accData.z * 100).rounded() / 100
-                    print("xDelta:\(self.accData.x) yDelta:\(self.accData.y) zDelta:\(self.accData.z)")
-
+                    let rawAccData = SensorData(x: Double(xSample) / 4096.0, y: Double(ySample) / 4096.0, z: Double(zSample) / 4096.0)
+                    self.processAccData(sensorData : rawAccData)
                 case 5 :
-                    print("5")
-                    self.gyroData.x = Double(xSample) / 16.384
-                    self.gyroData.y = Double(ySample) / 16.384
-                    self.gyroData.z = Double(zSample) / 16.384
-
-                    // Round to two decimal places
-                    self.gyroData.x = (self.gyroData.x * 100).rounded() / 100
-                    self.gyroData.y = (self.gyroData.y * 100).rounded() / 100
-                    self.gyroData.z = (self.gyroData.z * 100).rounded() / 100
-                    print("xDelta:\(self.gyroData.x) yDelta:\(self.gyroData.y) zDelta:\(self.gyroData.z)")
-
+                    
+                    let rawAccData = SensorData(x: Double(xSample) / 16.384, y: Double(ySample) / 16.384, z: Double(zSample) / 16.384)
+                    self.processGyroData(sensorData : rawAccData)
+                    
                 default:
                     print("Other")
                 }
             }
         }
+    }
+    
+    func processAccData(sensorData : SensorData){
+        let filteredAccData = dataProcessor.applyEwmaFilter(sensorData, self.accData)
+        self.accData = filteredAccData
+        let angles = dataProcessor.calculateEulerAngles(filteredAccData)
+
+        self.accData = sensorData
+        
+        let result = Int(angles.pitch + 90) % 360
+        let elapsedTime = Date().timeIntervalSince(self.startTime ?? Date())
+        filteredData.append(ChartData(time: Double(elapsedTime), degree: Double(result)))
+    }
+    func processGyroData(sensorData : SensorData){
+        
+        let combData = dataProcessor.applyComplementaryFilter(self.accData, sensorData)
+        let angels = dataProcessor.calculateEulerAngles(combData)
+        let result = Int(angels.pitch + 90) % 360
+        let elapsedTime = Date().timeIntervalSince(self.startTime ?? Date())
+        combinedData.append(ChartData(time: Double(elapsedTime), degree: Double(result)))
+    }
+    
+    func startExternalSensor(){
+        isOver = true
+    }
+
+    
+    func stopExternalSensor(){
+        isOver = false
+    }
+
+    
+    func isOverExternal() -> Bool {
+        return isOver
     }
     
    

@@ -15,7 +15,7 @@ class DataProcessor{
     var alpha: Double
     
     init() {
-        self.alpha = 0.25
+        self.alpha = 0.95
     }
     
     func applyEwmaFilter(_ input: SensorData, _ previousAccelerometerOutput: SensorData) -> SensorData {

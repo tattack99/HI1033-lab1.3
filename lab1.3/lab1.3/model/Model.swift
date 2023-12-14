@@ -12,7 +12,7 @@ import Combine
 
 class Model: ObservableObject {
     
-    private var polar: BluetoothConnect
+    private var externalSensor: BluetoothConnect
     private var storage : PersistenceController
     private var fileMangaer : FileManageModel
     @Published private var internalSensor: MotionManagerModel
@@ -27,7 +27,7 @@ class Model: ObservableObject {
     @Published var combinedData: [ChartData] = []
     
     init() {
-        polar = BluetoothConnect()
+        externalSensor = BluetoothConnect()
         storage = PersistenceController()
         internalSensor = MotionManagerModel()
         fileMangaer = FileManageModel()
@@ -48,7 +48,7 @@ class Model: ObservableObject {
     }
     
     func connectToPeripheral(_ peripheral: CBPeripheral) {
-        polar.connectToPeripheral(peripheral)
+        externalSensor.connectToPeripheral(peripheral)
     }
     
     func startInternalSensor(){
@@ -63,6 +63,20 @@ class Model: ObservableObject {
     
     func isOver() -> Bool {
         return internalSensor.isOver
+    }
+    
+    func startExternalSensor(){
+        externalSensor.startExternalSensor()
+    }
+
+    
+    func stopExternalSensor(){
+        externalSensor.stopExternalSensor()
+    }
+
+    
+    func isOverExternal() -> Bool {
+        return externalSensor.isOverExternal()
     }
     
     func listFilesFromDocumentsFolder() -> [String] {
@@ -95,18 +109,28 @@ class Model: ObservableObject {
     }
     
     private func initBluetoothConnect(){
-        polar.onPeripheralDiscovered = { [weak self] peripheral in
+        externalSensor.onPeripheralDiscovered = { [weak self] peripheral in
             if !(self?.discoveredPeripherals.contains(peripheral) ?? false) {
                 self?.discoveredPeripherals.append(peripheral)
             }
         }
-        polar.onBluetoothStatusChanged = { [weak self] status in
+        externalSensor.onBluetoothStatusChanged = { [weak self] status in
             self?.bluetoothStatus = status
         }
-        polar.onPeripheralStateChanged = { [weak self] state in
+        externalSensor.onPeripheralStateChanged = { [weak self] state in
             self?.peripheralState = state
-            
         }
+        externalSensor.$filteredData
+            .sink { [weak self] newChartData in
+                self?.filteredData = newChartData
+            }
+            .store(in: &cancellables)
+        
+        externalSensor.$combinedData
+            .sink { [weak self] newChartData in
+                self?.combinedData = newChartData
+            }
+            .store(in: &cancellables)
     }
     
 }

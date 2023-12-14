@@ -20,9 +20,9 @@ struct ExternalSensorScreen: View {
             AngelsView(combinedData: viewModel.combinedData, filteredData: viewModel.filteredData)
             
             
-            if(!viewModel.isOver()){
+            if(!viewModel.isOverExternal()){
                 AppButtonView(title: "Stop", action: {
-                    viewModel.stopInternalSensor()
+                    viewModel.stopExternalSensor()
                 })
              
             }else
@@ -32,19 +32,22 @@ struct ExternalSensorScreen: View {
                     showShareSheet = true
                 })
                 .sheet(isPresented: $showShareSheet) {
-
                     FileListView()
                 }
             }
 
-            Text("Internal sensor")
+            Text("External sensor")
         }
         .onAppear(perform: {
-            viewModel.startInternalSensor()
+            viewModel.startExternalSensor()
         })
         .onDisappear(perform: {
-            viewModel.stopInternalSensor()
+            viewModel.stopExternalSensor()
         })
+        .alert(isPresented: $viewModel.showAlert) {
+            Alert(title: Text("Connection Error"), message: Text(viewModel.alertMessage), dismissButton: .default(Text("OK")))
+        }
+        
     }
     
 }
