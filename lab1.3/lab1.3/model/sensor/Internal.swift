@@ -8,17 +8,20 @@
 import Foundation
 import CoreMotion
 
-class MotionManagerModel {
+class MotionManagerModel: ObservableObject {
     private let motionManager = CMMotionManager()
     private let dataProcessor = DataProcessor()
     private var lastAccelerometerOutput = SensorData(x: 0, y: 0, z: 0)
     private var lastGyroOutput = SensorData(x: 0, y: 0, z: 0)
-    private var time = 0
-    private var maxTime = 300
-    
+    private let updatedInterval = 0.1 // in seconds
+    private let duration = 30.0 // total duration in seconds
+    private var timer: DispatchSourceTimer?
+    private var startTime: Date?
+
+    @Published var isOver = false
     @Published var filteredData: [ChartData] = []
     @Published var combinedData: [ChartData] = []
-  
+    
 
     func startMotionUpdates() {
         guard motionManager.isAccelerometerAvailable, motionManager.isGyroAvailable else {
@@ -26,21 +29,33 @@ class MotionManagerModel {
             return
         }
 
-        motionManager.accelerometerUpdateInterval = 0.1
-        motionManager.gyroUpdateInterval = 0.1
+        startTime = Date()
 
+        motionManager.accelerometerUpdateInterval = updatedInterval
+        motionManager.gyroUpdateInterval = updatedInterval
+
+        startTimer()
         startAccelerometerUpdates()
         startGyroUpdates()
+        
+        
+    }
+    func stopMotionUpdates() {
+        motionManager.stopAccelerometerUpdates()
+        motionManager.stopGyroUpdates()
+        timer?.cancel()
+        timer = nil
+        isOver = true
+        // TODO: save the data in persistence
     }
 
     private func startAccelerometerUpdates() {
-   
+
         motionManager.startAccelerometerUpdates(to: OperationQueue.current!) { [weak self] (data, error) in
             guard let self = self, let accelerometerData = data, error == nil else {
                 print("Error: \(error!)")
                 return
             }
-            
             
             let accelerationData = SensorData(
                 x:accelerometerData.acceleration.x,
@@ -49,61 +64,63 @@ class MotionManagerModel {
             )
 
             let filtData = dataProcessor.applyEwmaFilter(accelerationData, lastAccelerometerOutput)
-            
             let angels = dataProcessor.calculateEulerAngles(filtData)
-            
             lastAccelerometerOutput = filtData
                 
-//            print("Filtered: roll: \(Int(angels.roll )%360), pitch: \(Int(angels.pitch + 90)%360), yaw: \(angels.yaw)" )
             let result = Int(angels.pitch + 90) % 360
-            filteredData.append(ChartData(time: Double(time), degree: Double(result)))
-            time = time + 1
-            if(time >= maxTime){
-                stopMotionUpdates()
-            }
-            
-        }
+            let elapsedTime = Date().timeIntervalSince(self.startTime ?? Date())
 
+            filteredData.append(ChartData(time: Double(elapsedTime), degree: Double(result)))
+        }
     }
 
     private func startGyroUpdates() {
+        
         motionManager.startGyroUpdates(to: OperationQueue.current!) { [weak self] (data, error) in
             guard let self = self, let gyroData = data, error == nil else {
                 print("Error: \(error!)")
                 return
             }
 
-            
             let gyroOutput = SensorData(
                 x:gyroData.rotationRate.x,
                 y:gyroData.rotationRate.y,
                 z:gyroData.rotationRate.z
             )
-
-            let combData = dataProcessor.applyComplementaryFilter(lastAccelerometerOutput, gyroOutput)
-        
-            let angels = dataProcessor.calculateEulerAngles(combData)
-
-//            print("Combined: roll: \(Int(angels.roll)%360), pitch: \(Int(angels.pitch + 90)%360), yaw: \(angels.yaw)\n")
             
+            let combData = dataProcessor.applyComplementaryFilter(lastAccelerometerOutput, gyroOutput)
+            let angels = dataProcessor.calculateEulerAngles(combData)
             let result = Int(angels.pitch + 90) % 360
-            combinedData.append(ChartData(time: Double(time), degree: Double(result)))
+            let elapsedTime = Date().timeIntervalSince(self.startTime ?? Date())
+            combinedData.append(ChartData(time: Double(elapsedTime), degree: Double(result)))
         }
     }
 
+    private func startTimer() {
+          reset()
+          timer = DispatchSource.makeTimerSource(queue: DispatchQueue.global())
+          timer?.schedule(deadline: .now(), repeating: updatedInterval, leeway: .milliseconds(100))
+          timer?.setEventHandler { [weak self] in
+              guard let self = self else { return }
+              if self.timerElapsed() {
+                  self.stopMotionUpdates()
+                  return
+              }
+          }
+          timer?.resume()
+      }
+
+      private func timerElapsed() -> Bool {
+          return filteredData.count * Int(updatedInterval) >= Int(duration)
+      }
  
 
-    
-    func stopMotionUpdates(){
-        motionManager.stopAccelerometerUpdates()
-        motionManager.stopGyroUpdates()
-        // TODO save the data in presistence
+    private func reset() {
         combinedData = []
         filteredData = []
-        time = 0
+        isOver = false
     }
-    
-    
+
     deinit {
         stopMotionUpdates()
     }

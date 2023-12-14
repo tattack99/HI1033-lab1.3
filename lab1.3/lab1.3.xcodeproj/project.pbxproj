@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		943B70142B2B2133005C9739 /* AppButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 943B70132B2B2133005C9739 /* AppButtonView.swift */; };
 		94D232922B29A5AC00A54EEB /* Internal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94D232912B29A5AC00A54EEB /* Internal.swift */; };
 		94D232942B29A5C100A54EEB /* DataProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94D232932B29A5C100A54EEB /* DataProcessor.swift */; };
 		94D232972B29A60F00A54EEB /* StartScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94D232962B29A60F00A54EEB /* StartScreen.swift */; };
@@ -30,6 +31,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		943B70132B2B2133005C9739 /* AppButtonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppButtonView.swift; sourceTree = "<group>"; };
 		94D232912B29A5AC00A54EEB /* Internal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Internal.swift; sourceTree = "<group>"; };
 		94D232932B29A5C100A54EEB /* DataProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataProcessor.swift; sourceTree = "<group>"; };
 		94D232962B29A60F00A54EEB /* StartScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StartScreen.swift; sourceTree = "<group>"; };
@@ -90,6 +92,7 @@
 				94D232A32B29F37600A54EEB /* ChartView.swift */,
 				94D232A52B2A180400A54EEB /* AngelsView.swift */,
 				94D232A72B2A1A8C00A54EEB /* ChartHeaderView.swift */,
+				943B70132B2B2133005C9739 /* AppButtonView.swift */,
 			);
 			path = views;
 			sourceTree = "<group>";
@@ -256,6 +259,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				943B70142B2B2133005C9739 /* AppButtonView.swift in Sources */,
 				94D232A82B2A1A8C00A54EEB /* ChartHeaderView.swift in Sources */,
 				94D2329B2B29A6A100A54EEB /* BluetoothListScreen.swift in Sources */,
 				94D232A62B2A180400A54EEB /* AngelsView.swift in Sources */,

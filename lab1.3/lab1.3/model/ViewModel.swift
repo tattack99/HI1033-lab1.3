@@ -15,7 +15,7 @@ import Combine
 
 class ViewModel : ObservableObject{
     private var hasConnectedOnce = false // Flag to track if connected once
-    private var model : Model
+    @Published private var model : Model
     private var cancellables = Set<AnyCancellable>()
     
     
@@ -92,10 +92,18 @@ class ViewModel : ObservableObject{
     func startInternalSensor(){
         model.startInternalSensor()
     }
+  
     
     func stopInternalSensor(){
+        self.objectWillChange.send()
         model.stopInternalSensor()
     }
+    
+  
+    func isOver() -> Bool {
+        return model.isOver()
+    }
+    
     
     private func initChartData(){
         model.$filteredData

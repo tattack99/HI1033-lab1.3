@@ -15,15 +15,15 @@ struct AngelsView: View {
         HStack {
             Spacer()
             if let lastCombinedData = combinedData.last {
-                Text("\(Int(lastCombinedData.degree))°").font(.system(size: 80))
+                Text("\(Int(lastCombinedData.degree))°").font(.system(size: 80)).foregroundColor(.red)
             } else {
-                Text("No combined data").font(.title)
+                Text("N/A").font(.title).foregroundColor(.red)
             }
             Spacer()
             if let lastFilteredData = filteredData.last {
-                Text("\(Int(lastFilteredData.degree))°").font(.system(size: 80))
+                Text("\(Int(lastFilteredData.degree))°").font(.system(size: 80)).foregroundColor(.blue)
             } else {
-                Text("No filtered data").font(.title)
+                Text("N/A").font(.title).foregroundColor(.blue)
             }
             Spacer()
         }

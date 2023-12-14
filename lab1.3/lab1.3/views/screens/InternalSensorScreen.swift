@@ -20,16 +20,20 @@ struct InternalSensorScreen: View {
             ChartHeaderView()
             ChartView(combinedData: viewModel.combinedData, filteredData: viewModel.filteredData)
             AngelsView(combinedData: viewModel.combinedData, filteredData: viewModel.filteredData)
-            Button(action: {
-                print("Exportig...")
-            }){
-                Text("Export result")
-                .padding()
-            }
-            .foregroundColor(.white)
-            .background(.blue)
-            .cornerRadius(10)
             
+            
+            if(!viewModel.isOver()){
+                AppButtonView(title: "Stop", action: {
+                    viewModel.stopInternalSensor()
+                })
+             
+            }else
+            {
+                AppButtonView(title: "Export reuslt", action: {
+                    print("Exporting...")
+                })
+            }
+
             Text("Internal sensor")
         }
         .onAppear(perform: {

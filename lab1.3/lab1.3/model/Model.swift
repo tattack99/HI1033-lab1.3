@@ -10,11 +10,11 @@ import CoreData
 import CoreBluetooth
 import Combine
 
-class Model {
+class Model: ObservableObject {
     
     private var polar: BluetoothConnect
     private var storage : PersistenceController
-    private var internalSensor: MotionManagerModel
+    @Published private var internalSensor: MotionManagerModel
     private var time = 0
     private var cancellables = Set<AnyCancellable>()
     
@@ -52,9 +52,15 @@ class Model {
     func startInternalSensor(){
         internalSensor.startMotionUpdates()
     }
+
     
     func stopInternalSensor(){
         internalSensor.stopMotionUpdates()
+    }
+
+    
+    func isOver() -> Bool {
+        return internalSensor.isOver
     }
     
     

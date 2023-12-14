@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ChartHeaderView: View {
     var body: some View {
-        VStack {
+        VStack  {
             Text("Chart").font(.title)
             HStack{
                 Spacer()
