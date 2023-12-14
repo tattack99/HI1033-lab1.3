@@ -31,13 +31,8 @@ struct InternalSensorScreen: View {
             }else
             {
                 AppButtonView(title: "Export reuslt", action: {
-                    viewModel.saveCSV(chartDataArray: viewModel.filteredData)
+                    viewModel.saveCSV(filterData: viewModel.filteredData, combineData: viewModel.combinedData)
                     showShareSheet = true
-                    // Get the file URL for test
-//                    let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
-//                    fileURL = paths[0].appendingPathComponent(filename)
-                    
- 
                 })
                 .sheet(isPresented: $showShareSheet) {
 

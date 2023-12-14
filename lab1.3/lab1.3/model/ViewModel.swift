@@ -68,8 +68,8 @@ class ViewModel : ObservableObject{
     
     
   
-    func saveCSV(chartDataArray: [ChartData]) {
-        model.saveCSV(chartDataArray: chartDataArray)
+    func saveCSV(filterData: [ChartData],combineData: [ChartData]) {
+        model.saveCSV(filterData: filterData, combineData: combineData)
     }
 
     
@@ -77,8 +77,11 @@ class ViewModel : ObservableObject{
         return model.listFilesFromDocumentsFolder()
     }
     
-    func readChartData(from fileName: String) -> [ChartData] {
-        return model.readChartData(fileName)
+    func readFilteredChartData(_ fileName: String) -> [ChartData] {
+        model.readFilteredChartData(fileName)
+    }
+    func readCombinedChartData(_ fileName: String) -> [ChartData] {
+        model.readCombinedChartData(fileName)
     }
     
     

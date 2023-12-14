@@ -69,12 +69,15 @@ class Model: ObservableObject {
         fileMangaer.listFilesFromDocumentsFolder()
     }
     
-    func readChartData(_ fileName: String) -> [ChartData] {
-        fileMangaer.readChartData(fileName)
+    func readFilteredChartData(_ fileName: String) -> [ChartData] {
+        fileMangaer.readFilteredChartDataArray(fileName)
+    }
+    func readCombinedChartData(_ fileName: String) -> [ChartData] {
+        fileMangaer.readCombinedChartDataArray(fileName)
     }
     
-    func saveCSV(chartDataArray: [ChartData]) {
-        fileMangaer.saveCSV(chartDataArray: chartDataArray)
+    func saveCSV(filterData: [ChartData],combineData: [ChartData]) {
+        fileMangaer.saveCSV(filteredData: filterData, combinedData: combineData)
     }
     
     private func initChartData(){
