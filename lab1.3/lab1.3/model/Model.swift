@@ -12,7 +12,7 @@ import Combine
 
 class Model {
     
-    private var polar: BluetoothConnect
+    private var externalSensor: BluetoothConnect
     private var storage : PersistenceController
     private var internalSensor: MotionManagerModel
     private var time = 0
@@ -25,10 +25,11 @@ class Model {
     @Published var filteredData: [ChartData] = []
     @Published var combinedData: [ChartData] = []
     
+    
     init() {
-        polar = BluetoothConnect()
         storage = PersistenceController()
         internalSensor = MotionManagerModel()
+        externalSensor = BluetoothConnect()
         initChartData()
         initBluetoothConnect()
     }
@@ -46,7 +47,7 @@ class Model {
     }
     
     func connectToPeripheral(_ peripheral: CBPeripheral) {
-        polar.connectToPeripheral(peripheral)
+        externalSensor.connectToPeripheral(peripheral)
     }
     
     func startInternalSensor(){
@@ -55,6 +56,14 @@ class Model {
     
     func stopInternalSensor(){
         internalSensor.stopMotionUpdates()
+    }
+    
+    func startExternalSensor(){
+        // TODO: Implement start
+    }
+    
+    func stopExternalSensor(){
+        // TODO: Implement stop
     }
     
     
@@ -73,15 +82,15 @@ class Model {
     }
     
     private func initBluetoothConnect(){
-        polar.onPeripheralDiscovered = { [weak self] peripheral in
+        externalSensor.onPeripheralDiscovered = { [weak self] peripheral in
             if !(self?.discoveredPeripherals.contains(peripheral) ?? false) {
                 self?.discoveredPeripherals.append(peripheral)
             }
         }
-        polar.onBluetoothStatusChanged = { [weak self] status in
+        externalSensor.onBluetoothStatusChanged = { [weak self] status in
             self?.bluetoothStatus = status
         }
-        polar.onPeripheralStateChanged = { [weak self] state in
+        externalSensor.onPeripheralStateChanged = { [weak self] state in
             self?.peripheralState = state
             
         }

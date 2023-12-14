@@ -9,13 +9,27 @@ import SwiftUI
 
 
 struct BluetoothListScreen: View {
+    @EnvironmentObject var viewModel : ViewModel
+
     var body: some View {
-        Text("Bluetooth list")
+        VStack{
+            Text(viewModel.bluetoothStatus)
+            List(viewModel.bluetoothDevices, id: \.identifier) { device in
+                Button(action: {
+                    viewModel.connectToBluetoothDevice(to: device)
+                }) {
+                    Text(device.name ?? "Unknown Device")
+                }
+            }
+            .alert(isPresented: $viewModel.showAlert) {
+                Alert(title: Text("Connection Error"), message: Text(viewModel.alertMessage), dismissButton: .default(Text("OK")))
+            }
+        }
     }
 }
 
 struct BluetoothListScreen_Previews: PreviewProvider {
     static var previews: some View {
-        BluetoothListScreen()
+        BluetoothListScreen().environmentObject(ViewModel())
     }
 }

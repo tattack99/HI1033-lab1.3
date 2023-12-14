@@ -97,6 +97,16 @@ class ViewModel : ObservableObject{
         model.stopInternalSensor()
     }
     
+    func startExternalSensor(){
+        print("Start external")
+        model.startInternalSensor()
+    }
+    
+    func stopExternalSensor(){
+        print("Stop external")
+        model.stopInternalSensor()
+    }
+    
     private func initChartData(){
         model.$filteredData
             .sink { [weak self] newChartData in
@@ -135,7 +145,6 @@ class ViewModel : ObservableObject{
                 
                 if state == .connecting {
                     self?.hasConnectedOnce = true
-                    print("connect to device!!!")
                 } else if state == .disconnected && self?.hasConnectedOnce == true {
                     self?.alertMessage = "Polar device disconnected."
                     self?.showAlert = true

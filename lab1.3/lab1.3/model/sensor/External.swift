@@ -16,11 +16,16 @@ struct SensorData {
 }
 
 class BluetoothConnect: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate {
-    var centralManager: CBCentralManager!
-    var peripheralBLE: CBPeripheral!
+    private var centralManager: CBCentralManager!
+    private var peripheralBLE: CBPeripheral!
+    private let dataProcessor = DataProcessor()
+
     
-    var accData: SensorData
-    var gyroData: SensorData
+    var lastAccData: SensorData
+    var lastGyroData: SensorData
+    var filteredData: [ChartData]
+    var combinedData: [ChartData]
+    
     var peripherals: [CBPeripheral]
     var onPeripheralDiscovered: ((CBPeripheral) -> Void)?
     var onPeripheralStateChanged: ((CBPeripheralState) -> Void)?
@@ -31,10 +36,11 @@ class BluetoothConnect: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
     let GATTData = CBUUID(string:    "fb005c82-02e7-f387-1cad-8acd2d8df0c8")
     
     override init(){
-        print("init")
-        self.accData = SensorData()
-        self.gyroData = SensorData()
+        self.lastAccData = SensorData()
+        self.lastGyroData = SensorData()
         self.peripherals = []
+        self.filteredData = []
+        self.combinedData = []
         
         super.init()
         self.centralManager = CBCentralManager(delegate: self, queue: nil)
@@ -64,10 +70,7 @@ class BluetoothConnect: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
 
     
     func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi RSSI: NSNumber) {
-        //print("Discover")
-                
         if let name = peripheral.name, name.contains("Polar"){
-            //print("Found Polar")
             if !peripherals.contains(peripheral) {
                 peripherals.append(peripheral)
                 print("Added Polar to List: \(String(describing: peripheral.name))")
@@ -77,7 +80,6 @@ class BluetoothConnect: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
     }
     
     func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
-        print("Connected")
         peripheral.discoverServices(nil)
         central.scanForPeripherals(withServices: [GATTService], options: nil)
         onPeripheralStateChanged?(.connected)
@@ -103,27 +105,21 @@ class BluetoothConnect: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
     
     func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
          for service in peripheral.services!{
-             print("Service Found")
              peripheral.discoverCharacteristics([GATTData, GATTCommand], for: service)
          }
      }
     
     func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
-        print("didDiscoverCharacteristics")
         guard let characteristics = service.characteristics else { return }
         
         for characteristic in characteristics {
             if characteristic.uuid == GATTData {
-                print("Data")
                 peripheral.setNotifyValue(true, for:characteristic)
             }
             if characteristic.uuid == GATTCommand{
-                print("Command")
-                
                 // Gyroscope
                 let gyroParameter : [UInt8]  = [0x02, 0x05, 0x00, 0x01, 0x34, 0x00, 0x01, 0x01, 0x10, 0x00, 0x02, 0x01, 0xD0, 0x07, 0x04, 0x01, 0x03]
                 let gyroData = NSData(bytes: gyroParameter, length: gyroParameter.count)
-                
                 peripheral.writeValue(gyroData as Data, for: characteristic, type: CBCharacteristicWriteType.withResponse)
             }
         }
@@ -213,38 +209,36 @@ class BluetoothConnect: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
                 switch measId {
                 case 2 :
                     print("2")
-                    self.accData.x = Double(xSample) / 4096.0
-                    self.accData.y = Double(ySample) / 4096.0
-                    self.accData.z = Double(zSample) / 4096.0
+                    self.lastAccData.x = Double(xSample) / 4096.0
+                    self.lastAccData.y = Double(ySample) / 4096.0
+                    self.lastAccData.z = Double(zSample) / 4096.0
 
                     // Round to two decimal places
-                    self.accData.x = (self.accData.x * 100).rounded() / 100
-                    self.accData.y = (self.accData.y * 100).rounded() / 100
-                    self.accData.z = (self.accData.z * 100).rounded() / 100
-                    print("xDelta:\(self.accData.x) yDelta:\(self.accData.y) zDelta:\(self.accData.z)")
-
+                    self.lastAccData.x = (self.lastAccData.x * 100).rounded() / 100
+                    self.lastAccData.y = (self.lastAccData.y * 100).rounded() / 100
+                    self.lastAccData.z = (self.lastAccData.z * 100).rounded() / 100
+                    print("xDelta:\(self.lastAccData.x) yDelta:\(self.lastAccData.y) zDelta:\(self.lastAccData.z)")
                 case 5 :
                     print("5")
-                    self.gyroData.x = Double(xSample) / 16.384
-                    self.gyroData.y = Double(ySample) / 16.384
-                    self.gyroData.z = Double(zSample) / 16.384
+                    self.lastGyroData.x = Double(xSample) / 16.384
+                    self.lastGyroData.y = Double(ySample) / 16.384
+                    self.lastGyroData.z = Double(zSample) / 16.384
 
                     // Round to two decimal places
-                    self.gyroData.x = (self.gyroData.x * 100).rounded() / 100
-                    self.gyroData.y = (self.gyroData.y * 100).rounded() / 100
-                    self.gyroData.z = (self.gyroData.z * 100).rounded() / 100
-                    print("xDelta:\(self.gyroData.x) yDelta:\(self.gyroData.y) zDelta:\(self.gyroData.z)")
-
+                    self.lastGyroData.x = (self.lastGyroData.x * 100).rounded() / 100
+                    self.lastGyroData.y = (self.lastGyroData.y * 100).rounded() / 100
+                    self.lastGyroData.z = (self.lastGyroData.z * 100).rounded() / 100
+                    print("xDelta:\(self.lastGyroData.x) yDelta:\(self.lastGyroData.y) zDelta:\(self.lastGyroData.z)")
                 default:
                     print("Other")
                 }
+                self.filterData()
             }
         }
+        
     }
     
-   
     static func parseDeltaFrame(_ data: Data, channels: UInt16, bitWidth: UInt16, totalBitLength: UInt16) -> [[Int16]]{
-        // convert array to bits
         let dataInBits = data.flatMap { (byte) -> [Bool] in
             return Array(stride(from: 0, to: 8, by: 1).map { (index) -> Bool in
                 return (byte & (0x01 << index)) != 0
@@ -272,6 +266,14 @@ class BluetoothConnect: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
             })
         })
     }
+    
+    private func filterData() {
+        
+    }
+
+
+    
+   
 
 }
 
