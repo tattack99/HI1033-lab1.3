@@ -16,6 +16,19 @@ struct ExternalSensorScreen: View {
         VStack{
             
             Text("Size_Filter:\(viewModel.filteredData.count), Size_Combo:\(viewModel.combinedData.count)")
+            Text(viewModel.bluetoothStatus)
+            if viewModel.isConnected {
+                Text("connected")
+            }
+            else {
+                Text("not connected")
+            }
+            if viewModel.failedToConnect {
+                Text("failed to connect")
+            }
+            else {
+                Text("did not fail")
+            }
 
             ChartHeaderView()
             ChartView(combinedData: viewModel.combinedData, filteredData: viewModel.filteredData)

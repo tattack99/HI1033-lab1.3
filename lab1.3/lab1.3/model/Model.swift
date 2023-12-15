@@ -23,6 +23,7 @@ class Model: ObservableObject {
     @Published var discoveredPeripherals : [CBPeripheral] = []
     @Published var bluetoothStatus : CBManagerState = .unknown
     @Published var peripheralState: CBPeripheralState = .disconnected
+    @Published var failedToConnect = false
     @Published var filteredData: [ChartData] = []
     @Published var combinedData: [ChartData] = []
     
@@ -116,6 +117,9 @@ class Model: ObservableObject {
         }
         externalSensor.onBluetoothStatusChanged = { [weak self] status in
             self?.bluetoothStatus = status
+        }
+        externalSensor.failedToConnect = { [weak self] status in
+            self?.failedToConnect = status
         }
         externalSensor.onPeripheralStateChanged = { [weak self] state in
             self?.peripheralState = state

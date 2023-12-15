@@ -22,7 +22,9 @@ class ViewModel : ObservableObject{
     @Published var items: [MyItem] = []
     @Published var bluetoothDevices: [CBPeripheral] = []
     @Published var bluetoothStatus : String = "unknown"
+    @Published var failedToConnect = false
     @Published var showAlert = false
+    @Published var isConnected = false
     @Published var alertMessage = ""
     @Published var filteredData: [ChartData] = []
     @Published var combinedData: [ChartData] = []
@@ -63,6 +65,7 @@ class ViewModel : ObservableObject{
     }
     
     func connectToBluetoothDevice(to peripheral: CBPeripheral) {
+        print("viewModel.connectToBluetoothDevice")
         model.connectToPeripheral(peripheral)
     }
     
@@ -107,6 +110,7 @@ class ViewModel : ObservableObject{
     
     func stopExternalSensor(){
         model.stopExternalSensor()
+        isConnected = false
     }
     
   
@@ -133,6 +137,9 @@ class ViewModel : ObservableObject{
         model.$discoveredPeripherals
             .receive(on: RunLoop.main)
             .assign(to: &$bluetoothDevices)
+        model.$failedToConnect
+            .receive(on: RunLoop.main)
+            .assign(to: &$failedToConnect)
         model.$bluetoothStatus.map { status in
             switch status {
             case .poweredOn:
@@ -151,14 +158,20 @@ class ViewModel : ObservableObject{
             .receive(on: RunLoop.main)
             .sink { [weak self] state in
                 
-                if state == .connecting {
+                if state == .connected {
                     self?.hasConnectedOnce = true
-                    print("connect to device!!!")
+                    print("connected to device!!!")
+                    self?.isConnected = true
                 } else if state == .disconnected && self?.hasConnectedOnce == true {
                     self?.alertMessage = "Polar device disconnected."
                     self?.showAlert = true
+                    self?.isConnected = false
                 }
             }
+            .store(in: &cancellables)
+        model.$failedToConnect
+            .receive(on: RunLoop.main)
+            .assign(to: \.failedToConnect, on: self)
             .store(in: &cancellables)
         
         

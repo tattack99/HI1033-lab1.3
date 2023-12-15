@@ -18,6 +18,9 @@ struct SensorData {
 class BluetoothConnect: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate {
     var centralManager: CBCentralManager!
     var peripheralBLE: CBPeripheral!
+    var gattCommandCharacteristic: CBCharacteristic?
+    
+
     
     var accData: SensorData
     var gyroData: SensorData
@@ -25,13 +28,25 @@ class BluetoothConnect: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
     var onPeripheralDiscovered: ((CBPeripheral) -> Void)?
     var onPeripheralStateChanged: ((CBPeripheralState) -> Void)?
     var onBluetoothStatusChanged: ((CBManagerState) -> Void)?
+    var failedToConnect: ((Bool) -> Void)?
+
+
+    var commandToWrite : String
+
+
     
     @Published var isOver = true
     @Published var filteredData: [ChartData] = []
     @Published var combinedData: [ChartData] = []
+    
+    var filteredDataOut: [ChartData] = []
+    var combinedDataOut: [ChartData] = []
     private var startTime: Date?
     private var timer: DispatchSourceTimer?
     private let dataProcessor = DataProcessor()
+    private var timeInterval = 0.1
+    private var timeIncrement = 0.0
+    private var timeEnd = 10
 
     
     let GATTService = CBUUID(string: "fb005c80-02e7-f387-1cad-8acd2d8df0c8")
@@ -43,6 +58,7 @@ class BluetoothConnect: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
         self.accData = SensorData()
         self.gyroData = SensorData()
         self.peripherals = []
+        self.commandToWrite = "acc"
         
         super.init()
         self.centralManager = CBCentralManager(delegate: self, queue: nil)
@@ -86,9 +102,33 @@ class BluetoothConnect: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
     
     func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
         print("Connected")
+        self.failedToConnect?(false)
         peripheral.discoverServices(nil)
         central.scanForPeripherals(withServices: [GATTService], options: nil)
         onPeripheralStateChanged?(.connected)
+    }
+    
+    func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
+         for service in peripheral.services!{
+             print("Service Found")
+             peripheral.discoverCharacteristics([GATTData, GATTCommand], for: service)
+         }
+     }
+    
+    func centralManager(_ central: CBCentralManager, didFailToConnect peripheral: CBPeripheral, error: Error?) {
+        print("Failed to connect to \(peripheral.name ?? "unknown device"). Error: \(error?.localizedDescription ?? "no error information")")
+        self.failedToConnect?(true)
+        // Handle specific error cases if needed
+        if let error = error as? CBError {
+            switch error.code {
+            case .unknown:
+                print("Unknown error occurred.")
+            case .peerRemovedPairingInformation:
+                print("Peer removed pairing information.")
+            default:
+                print("Other error occurred: \(error.localizedDescription)")
+            }
+        }
     }
     
     func connectToPeripheral(_ peripheral: CBPeripheral) {
@@ -97,8 +137,8 @@ class BluetoothConnect: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
         self.peripheralBLE = peripheral
         self.peripheralBLE?.delegate = self
         self.centralManager?.connect(peripheralBLE!, options: nil)
+        onPeripheralStateChanged?(.connecting)
         self.centralManager.stopScan()
-        
     }
     
     func peripheral(_ peripheral: CBPeripheral, didUpdateState newState: CBPeripheralState) {
@@ -109,33 +149,28 @@ class BluetoothConnect: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
     }
 
     
-    func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
-         for service in peripheral.services!{
-             print("Service Found")
-             peripheral.discoverCharacteristics([GATTData, GATTCommand], for: service)
-         }
-     }
-    
     func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
-        print("didDiscoverCharacteristics")
+        print("didDiscoverCharacteristicsFor")
         guard let characteristics = service.characteristics else { return }
         
         for characteristic in characteristics {
             if characteristic.uuid == GATTData {
-                print("Data")
-                peripheral.setNotifyValue(true, for:characteristic)
+                print("GATTData")
+                peripheral.setNotifyValue(true, for: characteristic)
             }
-            if characteristic.uuid == GATTCommand{
-                print("Command")
+            
+            if characteristic.uuid == GATTCommand {
+                print("GATTCommand")
+                self.gattCommandCharacteristic = characteristic
                 
-                // Gyroscope
-                let gyroParameter : [UInt8]  = [0x02, 0x05, 0x00, 0x01, 0x34, 0x00, 0x01, 0x01, 0x10, 0x00, 0x02, 0x01, 0xD0, 0x07, 0x04, 0x01, 0x03]
-                let gyroData = NSData(bytes: gyroParameter, length: gyroParameter.count)
+                let accParameter: [UInt8] = [0x02, 0x02, 0x00, 0x01, 0x34, 0x00, 0x01, 0x01, 0x10, 0x00, 0x02, 0x01, 0x08, 0x00, 0x04, 0x01, 0x03]
+                let accData = Data(bytes: accParameter, count: accParameter.count)
                 
-                peripheral.writeValue(gyroData as Data, for: characteristic, type: CBCharacteristicWriteType.withResponse)
+                peripheral.writeValue(accData, for: characteristic, type: .withResponse)
             }
         }
     }
+
     
     func peripheral(_ peripheral: CBPeripheral, didWriteValueFor characteristic: CBCharacteristic, error: Error?) {
         if let error = error {
@@ -144,12 +179,14 @@ class BluetoothConnect: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
         }
 
         if characteristic.uuid == GATTCommand {
-            let accParameter: [UInt8] = [0x02, 0x02, 0x00, 0x01, 0x34, 0x00, 0x01, 0x01, 0x10, 0x00, 0x02, 0x01, 0x08, 0x00, 0x04, 0x01, 0x03]
-            let accData = Data(bytes: accParameter, count: accParameter.count)
-
-            peripheral.writeValue(accData as Data, for: characteristic, type: CBCharacteristicWriteType.withResponse)
+            let gyroParameter: [UInt8] = [0x02, 0x05, 0x00, 0x01, 0x34, 0x00, 0x01, 0x01, 0x10, 0x00, 0x02, 0x01, 0xD0, 0x07, 0x04, 0x01, 0x03]
+            let gyroData = Data(bytes: gyroParameter, count: gyroParameter.count)
+            peripheral.writeValue(gyroData, for: characteristic, type: .withResponse)
+            
         }
     }
+     
+
 
     
     func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic,error: Error?) {
@@ -224,8 +261,8 @@ class BluetoothConnect: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
                     let rawAccData = SensorData(x: Double(xSample) / 4096.0, y: Double(ySample) / 4096.0, z: Double(zSample) / 4096.0)
                     self.processAccData(sensorData : rawAccData)
                 case 5 :
-                    let rawAccData = SensorData(x: Double(xSample) / 16.384, y: Double(ySample) / 16.384, z: Double(zSample) / 16.384)
-                    self.processGyroData(sensorData : rawAccData)
+                    let rawGyroData = SensorData(x: Double(xSample) / 16.384, y: Double(ySample) / 16.384, z: Double(zSample) / 16.384)
+                    self.processGyroData(sensorData : rawGyroData)
                     
                 default:
                     print("Other")
@@ -236,7 +273,6 @@ class BluetoothConnect: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
     
     func processAccData(sensorData : SensorData){
         let filteredAccData = dataProcessor.applyEwmaFilter(sensorData, self.accData)
-        self.accData = sensorData
         let angles = dataProcessor.calculateEulerAngles(filteredAccData)
 
         self.accData = sensorData
@@ -244,17 +280,29 @@ class BluetoothConnect: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
         let result = Int(angles.pitch + 90) % 360
         let elapsedTime = Date().timeIntervalSince(self.startTime ?? Date())
         filteredData.append(ChartData(time: Double(elapsedTime), degree: Double(result)))
+        /*
+        if(elapsedTime >= timeIncrement){
+            filteredData.append(ChartData(time: Double(elapsedTime), degree: Double(result)))
+            timeIncrement = timeIncrement + timeInterval
+        }
+         */
     }
     func processGyroData(sensorData : SensorData){
         
         let combData = dataProcessor.applyComplementaryFilter(self.accData, sensorData)
         let angels = dataProcessor.calculateEulerAngles(combData)
         
+        self.gyroData = sensorData
+        
         let result = Int(angels.pitch + 90) % 360
         let elapsedTime = Date().timeIntervalSince(self.startTime ?? Date())
         combinedData.append(ChartData(time: Double(elapsedTime), degree: Double(result)))
-        
-        self.gyroData = sensorData
+        /*
+        if(elapsedTime >= timeIncrement){
+            combinedData.append(ChartData(time: Double(elapsedTime), degree: Double(result)))
+            timeIncrement = timeIncrement + timeInterval
+        }
+         */
     }
     
     func startExternalSensor(){
@@ -264,11 +312,29 @@ class BluetoothConnect: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
     
     func stopExternalSensor(){
         isOver = true
+        disconnectFromSensor()
+        reset()
+    }
+    
+    func reset(){
+        filteredData = []
+        combinedData = []
+        filteredDataOut = []
+        combinedDataOut = []
+        timeIncrement = 0.0
     }
 
     
     func isOverExternal() -> Bool {
         return isOver
+    }
+    
+    func disconnectFromSensor() {
+        print("disconnectFromSensor")
+        guard let characteristic = gattCommandCharacteristic else { return }
+        let command: [UInt8] = [0x02, 0x02] // Disconnection command
+        let commandData = Data(bytes: command, count: command.count)
+        peripheralBLE.writeValue(commandData, for: characteristic, type: .withResponse)
     }
     
    

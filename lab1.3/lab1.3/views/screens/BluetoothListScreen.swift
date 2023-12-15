@@ -6,27 +6,34 @@
 //
 
 import SwiftUI
+import CoreBluetooth
 
 
 struct BluetoothListScreen: View {
     @EnvironmentObject var viewModel : ViewModel
+    @State private var navigateToExternalSensorScreen = false
     
     var body: some View {
         VStack{
             Text(viewModel.bluetoothStatus)
+            if viewModel.isConnected {
+                Text("connected")
+            }
+            else {
+                Text("not connected")
+            }
             List(viewModel.bluetoothDevices, id: \.identifier) { device in
-                NavigationLink(destination: ExternalSensorScreen()) {
+                Button(action: {
+                    viewModel.connectToBluetoothDevice(to: device)
+                }){
                     Text(device.name ?? "Unknown Device")
-                        .onTapGesture {
-                            viewModel.connectToBluetoothDevice(to: device)
-                        }
                 }
             }
-            .alert(isPresented: $viewModel.showAlert) {
-                Alert(title: Text("Connection Error"), message: Text(viewModel.alertMessage), dismissButton: .default(Text("OK")))
-            }
         }
-        
+        .background(NavigationLink("", destination: ExternalSensorScreen(), isActive: $viewModel.isConnected))
+        .alert(isPresented: $viewModel.showAlert) {
+            Alert(title: Text("Connection Error"), message: Text(viewModel.alertMessage), dismissButton: .default(Text("OK")))
+        }
     }
 }
 
