@@ -44,9 +44,9 @@ class BluetoothConnect: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
     private var startTime: Date?
     private var timer: DispatchSourceTimer?
     private let dataProcessor = DataProcessor()
-    private var timeInterval = 0.1
+    private var timeInterval = 0.05
     private var timeIncrement = 0.0
-    private var timeEnd = 10
+    private var timeEnd = 30.0
 
     
     let GATTService = CBUUID(string: "fb005c80-02e7-f387-1cad-8acd2d8df0c8")
@@ -192,7 +192,7 @@ class BluetoothConnect: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
     func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic,error: Error?) {
         guard !isOver else { return }
         
-        print("New data")
+        //print("New data")
         let data = characteristic.value
         var byteArray: [UInt8] = []
         for i in data! {
@@ -214,7 +214,7 @@ class BluetoothConnect: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
         let frameType = data![offset]
         offset += 1
     
-        print("MessageID:\(measId) Time:\(timeStamp) Frame Type:\(frameType)")
+        //print("MessageID:\(measId) Time:\(timeStamp) Frame Type:\(frameType)")
         
         
         let xBytes = data!.subdata(in: offset..<offset+2) as NSData
@@ -232,7 +232,7 @@ class BluetoothConnect: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
         memcpy(&zSample,zBytes.bytes,2)
         offset += 2
         
-        print("xRef:\(xSample >> 11) yRef:\(ySample >> 11) zRef:\(zSample >> 11)")
+        //print("xRef:\(xSample >> 11) yRef:\(ySample >> 11) zRef:\(zSample >> 11)")
         
         let deltaSize = UInt16(data![offset])
         offset += 1
@@ -271,49 +271,63 @@ class BluetoothConnect: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
         }
     }
     
-    func processAccData(sensorData : SensorData){
-        let filteredAccData = dataProcessor.applyEwmaFilter(sensorData, self.accData)
-        let angles = dataProcessor.calculateEulerAngles(filteredAccData)
+    func processAccData(sensorData: SensorData) {
+        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+            guard let strongSelf = self else { return }
 
-        self.accData = sensorData
-        
-        let result = Int(angles.pitch + 90) % 360
-        let elapsedTime = Date().timeIntervalSince(self.startTime ?? Date())
-        filteredData.append(ChartData(time: Double(elapsedTime), degree: Double(result)))
-        /*
-        if(elapsedTime >= timeIncrement){
-            filteredData.append(ChartData(time: Double(elapsedTime), degree: Double(result)))
-            timeIncrement = timeIncrement + timeInterval
+            // Perform the data processing in the background
+            let filteredAccData = strongSelf.dataProcessor.applyEwmaFilter(sensorData, strongSelf.accData)
+            let angles = strongSelf.dataProcessor.calculateEulerAngles(filteredAccData)
+
+            let result = Int(angles.pitch + 90) % 360
+            let elapsedTime = Date().timeIntervalSince(strongSelf.startTime ?? Date())
+
+            // Once processing is done, update the UI on the main thread
+            DispatchQueue.main.async {
+                strongSelf.filteredData.append(ChartData(time: Double(elapsedTime), degree: Double(result)))
+                if elapsedTime >= strongSelf.timeEnd {
+                    strongSelf.stopExternalSensor()
+                }
+            }
         }
-         */
-    }
-    func processGyroData(sensorData : SensorData){
-        
-        let combData = dataProcessor.applyComplementaryFilter(self.accData, sensorData)
-        let angels = dataProcessor.calculateEulerAngles(combData)
-        
-        self.gyroData = sensorData
-        
-        let result = Int(angels.pitch + 90) % 360
-        let elapsedTime = Date().timeIntervalSince(self.startTime ?? Date())
-        combinedData.append(ChartData(time: Double(elapsedTime), degree: Double(result)))
-        /*
-        if(elapsedTime >= timeIncrement){
-            combinedData.append(ChartData(time: Double(elapsedTime), degree: Double(result)))
-            timeIncrement = timeIncrement + timeInterval
-        }
-         */
     }
     
+    
+    func processGyroData(sensorData: SensorData) {
+        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+            guard let strongSelf = self else { return }
+
+            // Perform the data processing in the background
+            let combData = strongSelf.dataProcessor.applyComplementaryFilter(strongSelf.accData, sensorData)
+            let angles = strongSelf.dataProcessor.calculateEulerAngles(combData)
+            let result = Int(angles.pitch + 90) % 360
+            let elapsedTime = Date().timeIntervalSince(strongSelf.startTime ?? Date())
+
+            // Once processing is done, update the UI on the main thread
+            DispatchQueue.main.async {
+                strongSelf.combinedData.append(ChartData(time: Double(elapsedTime), degree: Double(result)))
+                if elapsedTime >= strongSelf.timeEnd {
+                    strongSelf.stopExternalSensor()
+                }
+            }
+        }
+    }
+
+    
     func startExternalSensor(){
+        reset()
         isOver = false
+        startTime = Date()  // Set the start time to the current time
     }
 
     
     func stopExternalSensor(){
-        isOver = true
-        disconnectFromSensor()
-        reset()
+        DispatchQueue.main.async { [weak self] in
+            self?.isOver = true
+            self?.disconnectFromSensor()
+            self?.timer?.cancel()
+            self?.timer = nil
+        }
     }
     
     func reset(){

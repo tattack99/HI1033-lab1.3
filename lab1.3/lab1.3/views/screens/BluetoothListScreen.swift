@@ -15,13 +15,6 @@ struct BluetoothListScreen: View {
     
     var body: some View {
         VStack{
-            Text(viewModel.bluetoothStatus)
-            if viewModel.isConnected {
-                Text("connected")
-            }
-            else {
-                Text("not connected")
-            }
             List(viewModel.bluetoothDevices, id: \.identifier) { device in
                 Button(action: {
                     viewModel.connectToBluetoothDevice(to: device)
